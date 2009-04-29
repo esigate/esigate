@@ -111,8 +111,22 @@ public class ResourceUtils {
     }
 
     public final static String getHttpUrlWithQueryString(RequestContext target) {
-        String url = concatUrl(target.getDriver().getBaseURL(), target
-                .getRelUrl());
+        String encodedUrl;
+        try {
+            // Encode all components but not "/" separators.
+            // FIXME: Notice that at this point, there is a weekness that makes
+            // WAT intrusive in some cases
+            // This can be illustrated with this exemples :
+            // http://<wat_host>/someprefix/someressource and
+            // http://<wat_host>/someprefix%2Fsomeressource
+            // We always guess the first case.
+            encodedUrl = URLEncoder.encode(target.getRelUrl(), "ISO-8859-1");
+            encodedUrl = encodedUrl.replaceAll("%2[Ff]", "/").replaceAll("\\+",
+                    "%20");
+        } catch (UnsupportedEncodingException ex) {
+            throw new RuntimeException(ex);
+        }
+        String url = concatUrl(target.getDriver().getBaseURL(), encodedUrl);
         String queryString = ResourceUtils.buildQueryString(target);
         if (queryString.length() == 0)
             return url;
