@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -61,7 +60,7 @@ public class RawHttpServer extends Thread {
     }
 
     public static byte[] buildHTTPBody(int httpStatus,
-            Map<String, String> headers, String rawBody) {
+            Map<String, String> headers, String rawBody) throws Exception {
         StringBuffer b = new StringBuffer("HTTP/1.1 ");
         b.append(httpStatus);
         b.append(" OK or not so ...\r\n");
@@ -74,7 +73,7 @@ public class RawHttpServer extends Thread {
         }
         b.append("\r\n");
         b.append(rawBody);
-        return b.toString().getBytes(Charset.forName("UTF-8"));
+        return b.toString().getBytes("UTF-8");
     }
 
     public static void main(String[] args) throws Exception {
