@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+	<properties>
+		<title>Edge Side Include</title>
+		<author email="fxbonnet@users.sourceforge.net">Francois-Xavier Bonnet</author>
+	</properties>
+	<body>
+		<h1>Edge Side Include</h1>
+		<section name="Edge Side Include (ESI)">
+			<p>
+				Currently aggregator servlet supports all features, according with
+				<a href="http://www.w3.org/TR/esi-lang">ESI language specification</a>, 
+				excluding Inline tag. 
+			</p>
+		</section>
+	</body>
+</document>
