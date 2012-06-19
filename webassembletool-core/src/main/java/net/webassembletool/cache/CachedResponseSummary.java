@@ -83,9 +83,11 @@ public class CachedResponseSummary extends BaseCachedResource {
 	 */
 	@Override
 	public String getRequestHeader(String key) {
-		for (Entry<String, String> entry : requestHeaders.entrySet()) {
-			if (key.equalsIgnoreCase(entry.getKey().toString())) {
-				return entry.getValue().toString();
+		synchronized (requestHeaders) {
+			for (Entry<String, String> entry : requestHeaders.entrySet()) {
+				if (key.equalsIgnoreCase(entry.getKey().toString())) {
+					return entry.getValue().toString();
+				}
 			}
 		}
 

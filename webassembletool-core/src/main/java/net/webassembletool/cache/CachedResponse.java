@@ -2,6 +2,7 @@ package net.webassembletool.cache;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -63,9 +64,11 @@ public class CachedResponse extends BaseCachedResource {
 		output.setStatus(statusCode, statusMessage);
 		try {
 			output.setCharsetName(charset);
-			for (Entry<String, Set<String>> entry : headers.entrySet()) {
-				for (String value : entry.getValue()) {
-					output.addHeader(entry.getKey(), value);
+			synchronized (headers) {
+				for (Entry<String, Set<String>> entry : headers.entrySet()) {
+					for (String value : entry.getValue()) {
+						output.addHeader(entry.getKey(), value);
+					}
 				}
 			}
 			output.open();
@@ -168,9 +171,11 @@ public class CachedResponse extends BaseCachedResource {
 	@Override
 	public String getRequestHeader(String key) {
 		if (requestHeaders != null) {
-			for (String name : requestHeaders.keySet()) {
-				if (key.equalsIgnoreCase(name)) {
-					return requestHeaders.get(name);
+			synchronized (requestHeaders) {
+				for (String name : requestHeaders.keySet()) {
+					if (key.equalsIgnoreCase(name)) {
+						return requestHeaders.get(name);
+					}
 				}
 			}
 		}
@@ -183,7 +188,8 @@ public class CachedResponse extends BaseCachedResource {
 	 */
 	public void setRequestHeader(String name, String value) {
 		if (requestHeaders == null) {
-			requestHeaders = new HashMap<String, String>();
+			requestHeaders = Collections
+					.synchronizedMap(new HashMap<String, String>());
 		}
 		this.requestHeaders.put(name, value);
 	}
@@ -202,7 +208,8 @@ public class CachedResponse extends BaseCachedResource {
 		@SuppressWarnings("unchecked")
 		Enumeration<String> e = request.getHeaderNames();
 		if (e != null && e.hasMoreElements()) {
-			HashMap<String, String> headers = new HashMap<String, String>();
+			Map<String, String> headers = Collections
+					.synchronizedMap(new HashMap<String, String>());
 			while (e.hasMoreElements()) {
 				String name = e.nextElement();
 				headers.put(name, request.getHeader(name));
@@ -221,7 +228,8 @@ public class CachedResponse extends BaseCachedResource {
 		s.setResponseBody(this.hasResponseBody());
 		s.setLocalDate(localDate);
 		// Copy Request headers
-		Map<String, String> requestHeaders2 = new HashMap<String, String>();
+		Map<String, String> requestHeaders2 = Collections
+				.synchronizedMap(new HashMap<String, String>());
 		if (requestHeaders != null) {
 			requestHeaders2.putAll(requestHeaders);
 		}

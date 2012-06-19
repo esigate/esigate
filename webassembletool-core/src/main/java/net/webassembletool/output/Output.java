@@ -71,11 +71,13 @@ public abstract class Output {
 
 	public final String getHeader(String key) {
 		String result = null;
-		for (Entry<String, Set<String>> entry : headers.entrySet()) {
-			if (key.equalsIgnoreCase(entry.getKey())
-					&& !entry.getValue().isEmpty()) {
-				result = entry.getValue().iterator().next();
-				break;
+		synchronized (headers) {
+			for (Entry<String, Set<String>> entry : headers.entrySet()) {
+				if (key.equalsIgnoreCase(entry.getKey())
+						&& !entry.getValue().isEmpty()) {
+					result = entry.getValue().iterator().next();
+					break;
+				}
 			}
 		}
 		return result;
@@ -83,10 +85,12 @@ public abstract class Output {
 
 	public final void setHeader(String key, String value) {
 		String keyToRemove = null;
-		for (String header : headers.keySet()) {
-			if (key.equalsIgnoreCase(header)) {
-				keyToRemove = header;
-				break;
+		synchronized (headers) {
+			for (String header : headers.keySet()) {
+				if (key.equalsIgnoreCase(header)) {
+					keyToRemove = header;
+					break;
+				}
 			}
 		}
 		if (keyToRemove != null) {
@@ -105,10 +109,12 @@ public abstract class Output {
 	 */
 	public final void addHeader(String name, String value) {
 		Set<String> values = null;
-		for (Entry<String, Set<String>> entry : headers.entrySet()) {
-			if (name.equalsIgnoreCase(entry.getKey())) {
-				values = entry.getValue();
-				break;
+		synchronized (headers) {
+			for (Entry<String, Set<String>> entry : headers.entrySet()) {
+				if (name.equalsIgnoreCase(entry.getKey())) {
+					values = entry.getValue();
+					break;
+				}
 			}
 		}
 		if (values == null) {

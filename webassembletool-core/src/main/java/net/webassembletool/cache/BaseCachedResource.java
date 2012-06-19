@@ -45,11 +45,13 @@ abstract class BaseCachedResource extends Resource implements Serializable {
 	@Override
 	public String getHeader(String key) {
 		String result = null;
-		for (Entry<String, Set<String>> entry : headers.entrySet()) {
-			if (key.equalsIgnoreCase(entry.getKey())
-					&& !entry.getValue().isEmpty()) {
-				result = entry.getValue().iterator().next();
-				break;
+		synchronized (headers) {
+			for (Entry<String, Set<String>> entry : headers.entrySet()) {
+				if (key.equalsIgnoreCase(entry.getKey())
+						&& !entry.getValue().isEmpty()) {
+					result = entry.getValue().iterator().next();
+					break;
+				}
 			}
 		}
 		return result;
@@ -58,10 +60,12 @@ abstract class BaseCachedResource extends Resource implements Serializable {
 	@Override
 	public Collection<String> getHeaders(String name) {
 		Collection<String> result = new TreeSet<String>();
-		for (Entry<String, Set<String>> entry : headers.entrySet()) {
-			if (name.equalsIgnoreCase(entry.getKey())) {
-				result.addAll(entry.getValue());
-				break;
+		synchronized (headers) {
+			for (Entry<String, Set<String>> entry : headers.entrySet()) {
+				if (name.equalsIgnoreCase(entry.getKey())) {
+					result.addAll(entry.getValue());
+					break;
+				}
 			}
 		}
 		return result;
@@ -69,10 +73,12 @@ abstract class BaseCachedResource extends Resource implements Serializable {
 
 	public void addHeader(String name, String value) {
 		Set<String> values = null;
-		for (Entry<String, Set<String>> entry : headers.entrySet()) {
-			if (name.equalsIgnoreCase(entry.getKey())) {
-				values = entry.getValue();
-				break;
+		synchronized (headers) {
+			for (Entry<String, Set<String>> entry : headers.entrySet()) {
+				if (name.equalsIgnoreCase(entry.getKey())) {
+					values = entry.getValue();
+					break;
+				}
 			}
 		}
 		if (values == null) {
