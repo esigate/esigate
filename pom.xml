@@ -486,12 +486,13 @@
 			<name>webassembletool Snapshot Repository</name>
 			<url>sftp://web.sourceforge.net/home/groups/w/we/webassembletool/htdocs/maven/snapshots</url>
 		</snapshotRepository>
-		<site>
+<!--
+ 		<site>
 			<id>webassembletool-site</id>
 			<name>ESIGate</name>
 			<url>sftp://web.sourceforge.net/home/groups/w/we/webassembletool/htdocs</url>
-			<!--<url>scp://shell.sourceforge.net/home/groups/w/we/webassembletool/htdocs</url>-->			
 		</site>
+-->
 	</distributionManagement>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
