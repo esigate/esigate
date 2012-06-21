@@ -1,6 +1,7 @@
 <% 
+	response.addHeader("Cache-control", "max-age=3600");
 	try {
-		Thread.sleep(500);
+		Thread.sleep(100);
 	} catch (InterruptedException e) {
 		// Nothing to do
 	}
