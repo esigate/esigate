@@ -76,6 +76,8 @@ public class HttpClientResponseTest extends TestCase {
 				httpResponse);
 		EasyMock.expect(httpResponse.getStatusLine()).andReturn(statusLine)
 				.anyTimes();
+		EasyMock.expect(httpRequest.getRequestLine()).andReturn(null)
+		.anyTimes();
 		EasyMock.expect(httpResponse.getEntity()).andReturn(null);
 		EasyMock.expect(httpResponse.getFirstHeader(HttpHeaders.LOCATION))
 				.andReturn(new BasicHeader("h", "value"));
@@ -174,6 +176,8 @@ public class HttpClientResponseTest extends TestCase {
 		EasyMock.expect(httpResponse.getFirstHeader(HttpHeaders.LOCATION))
 				.andReturn(new BasicHeader(HttpHeaders.LOCATION, "value"));
 
+		EasyMock.expect(httpRequest.getRequestLine()).andReturn(null);
+		
 		control.replay();
 		tested = new HttpClientResponse(httpHost, httpRequest, httpClient,
 				cookieStore);

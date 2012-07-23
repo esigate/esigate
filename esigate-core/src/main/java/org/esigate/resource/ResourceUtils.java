@@ -23,7 +23,8 @@ import org.slf4j.LoggerFactory;
  * @author Francois-Xavier Bonnet
  */
 public class ResourceUtils {
-	private static final Logger LOG = LoggerFactory.getLogger(ResourceUtils.class);
+	private static final Logger LOG = LoggerFactory
+			.getLogger(ResourceUtils.class);
 
 	/**
 	 * Private constructor
@@ -39,23 +40,27 @@ public class ResourceUtils {
 			if (charset == null) {
 				charset = "ISO-8859-1";
 			}
-			String originalQuerystring = target.getOriginalRequest()
-					.getQueryString();
-			if (target.isProxy() && originalQuerystring != null) {
-				// Remove jsessionid from request if it is present
-				// As we are in a java application, the container might add
-				// jsessionid to the querystring. We must not forward it to
-				// included applications.
-				String jsessionid = null;
-				HttpSession session = target.getOriginalRequest().getSession(false);
-				if (session != null) {
-					jsessionid = session.getId();
+
+			if (target.isProxy()) {
+				String originalQuerystring = target.getOriginalRequest()
+						.getQueryString();
+				if (originalQuerystring != null) {
+					// Remove jsessionid from request if it is present
+					// As we are in a java application, the container might add
+					// jsessionid to the querystring. We must not forward it to
+					// included applications.
+					String jsessionid = null;
+					HttpSession session = target.getOriginalRequest()
+							.getSession(false);
+					if (session != null) {
+						jsessionid = session.getId();
+					}
+					if (jsessionid != null) {
+						originalQuerystring = RewriteUtils.removeSessionId(
+								jsessionid, originalQuerystring);
+					}
+					queryString.append(originalQuerystring);
 				}
-				if (jsessionid != null) {
-					originalQuerystring = RewriteUtils.removeSessionId(
-							jsessionid, originalQuerystring);
-				}
-				queryString.append(originalQuerystring);
 			}
 			if (target.getParameters() != null) {
 				ResourceUtils.appendParameters(queryString, charset,
@@ -75,7 +80,8 @@ public class ResourceUtils {
 	 *            the value of http header Content-Type
 	 * @return true if this represents text or false if not
 	 */
-	public static boolean isTextContentType(String contentType, Collection<String> textContentTypes) {
+	public static boolean isTextContentType(String contentType,
+			Collection<String> textContentTypes) {
 		boolean isText = false;
 
 		if (contentType != null) {
