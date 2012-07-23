@@ -119,12 +119,34 @@ public class HttpClientResponse {
 		this.error = false;
 	}
 
+	/**
+	 * 
+	 * Release the connection to the connection manager.</p>
+	 * 
+	 * Ensure this method is always called after creating an HttpClientResponse.
+	 */
 	public void finish() {
-		if (content != null) {
-			try {
-				content.close();
-			} catch (IOException e) {
-				LOG.warn("Could not close response stream properly", e);
+
+		try {
+
+			// Ensure stream has been opened
+			// or else HttpClient won't release the connection.
+			if (content == null && httpEntity != null) {
+				openStream();
+			}
+
+		} catch (IOException e) {
+			LOG.warn("Failed to get stream", e);
+		} finally {
+
+			// Then always close the stream.
+			// or else HttpClient won't release the connection.
+			if (content != null) {
+				try {
+					content.close();
+				} catch (IOException e) {
+					LOG.warn("Could not close response stream properly", e);
+				}
 			}
 		}
 	}
