@@ -7,6 +7,6 @@
 	<parent>
 		<groupId>org.esigate</groupId>
 		<artifactId>esigate-maven</artifactId>
-		<version>3.4.1</version>
+		<version>3.4.2-SNAPSHOT</version>
 	</parent>
 </project>
