@@ -10,7 +10,7 @@ import org.esigate.api.Cookie;
 import org.esigate.cookie.BasicClientCookie;
 import org.esigate.cookie.CustomCookieStore;
 
-class CookieAdapter {
+public class CookieAdapter {
 
 	public static CookieStore convertCookieStore(CustomCookieStore customStore) {
 		return new Adapter(customStore);
