@@ -31,10 +31,12 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.GzipDecompressingEntity;
+import org.apache.http.client.params.CookiePolicy;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.conn.ConnectionPoolTimeoutException;
 import org.apache.http.conn.HttpHostConnectException;
+import org.apache.http.cookie.CookieSpecRegistry;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
@@ -55,11 +57,19 @@ public class HttpClientResponse {
 	private int statusCode;
 	private String statusText;
 	private InputStream content;
+	private static final CookieSpecRegistry cookieSpecRegistry;
+	static {
+		cookieSpecRegistry = new CookieSpecRegistry();
+		cookieSpecRegistry.register(CookiePolicy.BROWSER_COMPATIBILITY, new BrowserCompatSpecFactory());
+	}
 
 	public HttpClientResponse(HttpHost httpHost, HttpRequest httpRequest,
 			HttpClient httpClient, CookieStore cookieStore) {
 		HttpContext httpContext = new BasicHttpContext();
 		try {
+			// FIXME This can be removed when switching to HttpClient 4.3
+			httpContext.setAttribute(ClientContext.COOKIESPEC_REGISTRY, cookieSpecRegistry);
+
 			httpContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
 			httpResponse = httpClient.execute(httpHost, httpRequest,
 					httpContext);

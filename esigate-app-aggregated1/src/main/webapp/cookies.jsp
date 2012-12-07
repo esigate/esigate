@@ -1,7 +1,7 @@
 <%@page import="java.util.Enumeration"%>
 <%@page contentType="text/html; charset=UTF-8"%>
 <%
-	response.addCookie(new Cookie("test0", "value0"));
+	response.addCookie(new Cookie("test0", "value 0"));
 %>
 <%
 	response.addCookie(new Cookie("test1", "value1"));
