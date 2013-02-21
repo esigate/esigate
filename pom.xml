@@ -12,7 +12,7 @@
 	<artifactId>esigate</artifactId>
 	<packaging>pom</packaging>
 	<name>esigate</name>
-	<version>4.0</version>
+	<version>4.1-SNAPSHOT</version>
 	<inceptionYear>2008</inceptionYear>
 	<mailingLists>
 		<mailingList>
