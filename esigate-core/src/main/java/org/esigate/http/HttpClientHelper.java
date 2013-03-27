@@ -140,11 +140,7 @@ public class HttpClientHelper {
 
 	private final static HttpClient decorateWithCache(EventManager d, HttpClient HttpClient, Properties properties) {
 		boolean useCache = Parameters.USE_CACHE.getValueBoolean(properties);
-		if (useCache) {
-			return CacheConfigHelper.addCache(d, properties, HttpClient);
-		} else {
-			return HttpClient;
-		}
+		return CacheConfigHelper.addCache(d, properties, HttpClient, useCache);
 	}
 
 	private HttpClientHelper(Properties properties, CookieManager cookieManager) {

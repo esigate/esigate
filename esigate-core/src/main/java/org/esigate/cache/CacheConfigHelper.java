@@ -58,24 +58,40 @@ public class CacheConfigHelper {
 		return cacheConfig;
 	}
 
-	public final static HttpClient addCache(EventManager d, Properties properties, HttpClient backend) {
-		String cacheStorageClass = Parameters.CACHE_STORAGE.getValueString(properties);
-		Object cacheStorage;
-		try {
-			cacheStorage = Class.forName(cacheStorageClass).newInstance();
-		} catch (Exception e) {
-			throw new ConfigurationException("Could not instantiate cacheStorageClass", e);
-		}
-		if (!(cacheStorage instanceof CacheStorage))
-			throw new ConfigurationException("Cache storage class must extend org.esigate.cache.CacheStorage.");
-		((CacheStorage) cacheStorage).init(properties);
-		CacheConfig cacheConfig = createCacheConfig(properties);
-		cacheConfig.setSharedCache(true);
+	/**
+	 * Add cache adapters. 
+	 * 
+	 * @param d
+	 * @param properties
+	 * @param backend
+	 * @param useCache  Really enable cache, on only wrap backend for fetch events.
+	 * @return
+	 */
+	public final static HttpClient addCache(EventManager d, Properties properties, HttpClient backend, boolean useCache) {
 		CacheAdapter cacheAdapter = new CacheAdapter();
 		cacheAdapter.init(properties);
 		HttpClient cachingHttpClient = cacheAdapter.wrapBackendHttpClient(d, backend);
-		cachingHttpClient = new CachingHttpClient(cachingHttpClient, (HttpCacheStorage) cacheStorage, cacheConfig);
-		cachingHttpClient = cacheAdapter.wrapCachingHttpClient(cachingHttpClient);
+		
+		if( useCache){
+			String cacheStorageClass = Parameters.CACHE_STORAGE
+					.getValueString(properties);
+			Object cacheStorage;
+			try {
+				cacheStorage = Class.forName(cacheStorageClass).newInstance();
+			} catch (Exception e) {
+				throw new ConfigurationException(
+						"Could not instantiate cacheStorageClass", e);
+			}
+			if (!(cacheStorage instanceof CacheStorage))
+				throw new ConfigurationException(
+						"Cache storage class must extend org.esigate.cache.CacheStorage.");
+			((CacheStorage) cacheStorage).init(properties);
+			CacheConfig cacheConfig = createCacheConfig(properties);
+			cacheConfig.setSharedCache(true);
+			cachingHttpClient = new CachingHttpClient(cachingHttpClient,
+					(HttpCacheStorage) cacheStorage, cacheConfig);
+			cachingHttpClient = cacheAdapter.wrapCachingHttpClient(cachingHttpClient);
+		}
 		return cachingHttpClient;
 	}
 
