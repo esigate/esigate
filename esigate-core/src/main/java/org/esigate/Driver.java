@@ -206,14 +206,14 @@ public class Driver {
 			try {
 				HttpRequestHelper.getMediator(request).sendResponse(httpResponse);
 			} catch( IOException ex){
-				LOG.warn("Error while sending the response", ex);
+				LOG.warn("Error while sending the response", ex.getMessage());
 				throw ex;
 			} finally {
 				// Ensure entity is consumed
 				try {
 					EntityUtils.consume(httpResponse.getEntity());
 				}catch (IOException ex) {
-					LOG.warn("Error while consuming the response entity", ex);
+					LOG.warn("Error while consuming the response entity", ex.getMessage());
 					// On error the content is consumed anyway.
 				}
 			}
@@ -254,14 +254,14 @@ public class Driver {
 			try {
 				HttpRequestHelper.getMediator(request).sendResponse(transformedResponse);
 			} catch( IOException ex){
-				LOG.warn("Error while sending the response", ex);
+				LOG.warn("Error while sending the response", ex.getMessage());
 				throw ex;
 			} finally {
 				// Ensure entity is consumed
 				try {
 					EntityUtils.consume(transformedResponse.getEntity());
 				}catch (IOException ex) {
-					LOG.warn("Error while consuming the response entity", ex);
+					LOG.warn("Error while consuming the response entity", ex.getMessage());
 					// On error the content is consumed anyway.
 				}
 			}
