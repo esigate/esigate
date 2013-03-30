@@ -202,7 +202,22 @@ public class Driver {
 		HttpResponse httpResponse = execute(httpRequest);
 		if (!isTextContentType(httpResponse)) {
 			LOG.debug("'{}' is binary on no transformation to apply: was forwarded without modification.", relUrl);
-			HttpRequestHelper.getMediator(request).sendResponse(httpResponse);
+			
+			try {
+				HttpRequestHelper.getMediator(request).sendResponse(httpResponse);
+			} catch( IOException ex){
+				LOG.warn("Error while sending the response", ex);
+				throw ex;
+			} finally {
+				// Ensure entity is consumed
+				try {
+					EntityUtils.consume(httpResponse.getEntity());
+				}catch (IOException ex) {
+					LOG.warn("Error while consuming the response entity", ex);
+					// On error the content is consumed anyway.
+				}
+			}
+			
 		} else {
 			LOG.debug("'{}' is text : will apply renderers.", relUrl);
 			String currentValue = HttpResponseUtils.toString(httpResponse);
