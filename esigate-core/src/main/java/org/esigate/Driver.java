@@ -34,6 +34,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicHttpResponse;
+import org.apache.http.util.EntityUtils;
 import org.esigate.cookie.CookieManager;
 import org.esigate.events.EventManager;
 import org.esigate.events.impl.ProxyEvent;
@@ -234,7 +235,21 @@ public class Driver {
 			HttpResponse transformedResponse = new BasicHttpResponse(httpResponse.getStatusLine());
 			transformedResponse.setHeaders(httpResponse.getAllHeaders());
 			transformedResponse.setEntity(transformedHttpEntity);
-			HttpRequestHelper.getMediator(request).sendResponse(transformedResponse);
+			
+			try {
+				HttpRequestHelper.getMediator(request).sendResponse(transformedResponse);
+			} catch( IOException ex){
+				LOG.warn("Error while sending the response", ex);
+				throw ex;
+			} finally {
+				// Ensure entity is consumed
+				try {
+					EntityUtils.consume(transformedResponse.getEntity());
+				}catch (IOException ex) {
+					LOG.warn("Error while consuming the response entity", ex);
+					// On error the content is consumed anyway.
+				}
+			}
 		}
 
 		// Event post-proxy
