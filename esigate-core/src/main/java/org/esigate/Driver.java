@@ -16,6 +16,7 @@
 package org.esigate;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -34,7 +35,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicHttpResponse;
-import org.apache.http.util.EntityUtils;
 import org.esigate.cookie.CookieManager;
 import org.esigate.events.EventManager;
 import org.esigate.events.impl.ProxyEvent;
@@ -200,24 +200,9 @@ public class Driver {
 		String url = ResourceUtils.getHttpUrlWithQueryString(relUrl, e.originalRequest, true);
 		GenericHttpRequest httpRequest = httpClientHelper.createHttpRequest(request, url, true);
 		HttpResponse httpResponse = execute(httpRequest);
+		
 		if (!isTextContentType(httpResponse)) {
 			LOG.debug("'{}' is binary on no transformation to apply: was forwarded without modification.", relUrl);
-			
-			try {
-				HttpRequestHelper.getMediator(request).sendResponse(httpResponse);
-			} catch( IOException ex){
-				LOG.warn("Error while sending the response", ex.getMessage());
-				throw ex;
-			} finally {
-				// Ensure entity is consumed
-				try {
-					EntityUtils.consume(httpResponse.getEntity());
-				}catch (IOException ex) {
-					LOG.warn("Error while consuming the response entity", ex.getMessage());
-					// On error the content is consumed anyway.
-				}
-			}
-			
 		} else {
 			LOG.debug("'{}' is text : will apply renderers.", relUrl);
 			String currentValue = HttpResponseUtils.toString(httpResponse);
@@ -251,19 +236,27 @@ public class Driver {
 			transformedResponse.setHeaders(httpResponse.getAllHeaders());
 			transformedResponse.setEntity(transformedHttpEntity);
 			
+			httpResponse = transformedResponse;
+		}
+		
+		try {
+			HttpRequestHelper.getMediator(request).sendResponse(httpResponse);
+		} catch( IOException ex){
+			LOG.warn("Error while sending the response", ex.getMessage());
+			throw ex;
+		} finally {
+			// Ensure entity is consumed
 			try {
-				HttpRequestHelper.getMediator(request).sendResponse(transformedResponse);
-			} catch( IOException ex){
-				LOG.warn("Error while sending the response", ex.getMessage());
-				throw ex;
-			} finally {
-				// Ensure entity is consumed
-				try {
-					EntityUtils.consume(transformedResponse.getEntity());
-				}catch (IOException ex) {
-					LOG.warn("Error while consuming the response entity", ex.getMessage());
-					// On error the content is consumed anyway.
+				HttpEntity entity = httpResponse.getEntity();
+				if (entity != null) {
+					InputStream is = entity.getContent();
+					if (is != null) {
+						is.close();
+					}
 				}
+			}catch (IOException ex) {
+				LOG.warn("Error while consuming the response entity", ex.getMessage());
+				// On error the content is consumed anyway.
 			}
 		}
 
