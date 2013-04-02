@@ -23,6 +23,7 @@ import java.util.Enumeration;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletInputStream;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -39,15 +40,19 @@ import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.apache.http.message.BasicLineParser;
 import org.apache.http.message.BasicRequestLine;
+import org.apache.http.util.EntityUtils;
 import org.esigate.api.ContainerRequestMediator;
 import org.esigate.util.HttpRequestHelper;
 import org.esigate.util.UriUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HttpServletMediator implements ContainerRequestMediator {
 	private final HttpServletRequest request;
 	private final HttpServletResponse response;
 	private final ServletContext servletContext;
 	private final HttpEntityEnclosingRequest httpRequest;
+	private static final Logger LOG = LoggerFactory.getLogger(HttpServletMediator.class);
 
 	public HttpServletMediator(HttpServletRequest request, HttpServletResponse response, ServletContext servletContext) throws IOException {
 		this.request = request;
@@ -163,7 +168,14 @@ public class HttpServletMediator implements ContainerRequestMediator {
 			Header contentEncoding = httpEntity.getContentEncoding();
 			if (contentEncoding != null)
 				response.setHeader(contentEncoding.getName(), contentEncoding.getValue());
-			httpEntity.writeTo(response.getOutputStream());
+		
+			try {
+				ServletOutputStream os = response.getOutputStream();
+				httpEntity.writeTo(os);
+			} catch (IOException e) {
+				LOG.warn("Error while sending the response", e);
+				EntityUtils.consume(httpResponse.getEntity());
+			}
 		}
 	}
 

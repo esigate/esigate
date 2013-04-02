@@ -16,7 +16,6 @@
 package org.esigate;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -35,6 +34,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicHttpResponse;
+import org.apache.http.util.EntityUtils;
 import org.esigate.cookie.CookieManager;
 import org.esigate.events.EventManager;
 import org.esigate.events.impl.ProxyEvent;
@@ -241,23 +241,9 @@ public class Driver {
 		
 		try {
 			HttpRequestHelper.getMediator(request).sendResponse(httpResponse);
-		} catch( IOException ex){
-			LOG.warn("Error while sending the response", ex.getMessage());
-			throw ex;
-		} finally {
-			// Ensure entity is consumed
-			try {
-				HttpEntity entity = httpResponse.getEntity();
-				if (entity != null) {
-					InputStream is = entity.getContent();
-					if (is != null) {
-						is.close();
-					}
-				}
-			}catch (IOException ex) {
-				LOG.warn("Error while consuming the response entity", ex.getMessage());
-				// On error the content is consumed anyway.
-			}
+		} 
+		finally {
+			EntityUtils.consumeQuietly(httpResponse.getEntity());
 		}
 
 		// Event post-proxy
