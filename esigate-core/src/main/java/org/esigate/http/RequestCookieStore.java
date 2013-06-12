@@ -24,8 +24,10 @@ import org.apache.http.cookie.Cookie;
 import org.esigate.cookie.CookieManager;
 
 /**
- * A CookieStore that delegates to the CookieManager instance associated with this Driver instance. The CookieManager will decide what to do with each cookie like forwarding it to the browser, storing
- * it to session or just ignoring it.
+ * A CookieStore that delegates to the CookieManager instance associated with
+ * this Driver instance. The CookieManager will decide what to do with each
+ * cookie like forwarding it to the browser, storing it to session or just
+ * ignoring it.
  * 
  * @see CookieStore
  * 
@@ -43,19 +45,19 @@ public class RequestCookieStore implements CookieStore {
 	}
 
 	public void addCookie(Cookie cookie) {
-		cookieManager.addCookie(cookie, originalRequest);
+		this.cookieManager.addCookie(cookie, this.originalRequest);
 	}
 
 	public List<Cookie> getCookies() {
-		return cookieManager.getCookies(originalRequest);
+		return this.cookieManager.getCookies(this.originalRequest);
 	}
 
 	public boolean clearExpired(Date date) {
-		return cookieManager.clearExpired(date,originalRequest);
+		return this.cookieManager.clearExpired(date, this.originalRequest);
 	}
 
 	public void clear() {
-		cookieManager.clear(originalRequest);
+		this.cookieManager.clear(this.originalRequest);
 	}
 
 }
