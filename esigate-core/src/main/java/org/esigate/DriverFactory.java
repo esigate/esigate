@@ -22,10 +22,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import org.esigate.impl2.IndexedInstances;
+import org.esigate.impl2.UriMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,10 +38,9 @@ import org.slf4j.LoggerFactory;
  * @author Nicolas Richeton
  */
 public class DriverFactory {
-	private static final Map<String, Driver> INSTANCES = new HashMap<String, Driver>();
+	private static IndexedInstances INSTANCES = new IndexedInstances(new HashMap<String, Driver>());
 	private static final String DEFAULT_INSTANCE_NAME = "default";
 	private static final Logger LOG = LoggerFactory.getLogger(DriverFactory.class);
-
 
 	static {
 		// Load default settings
@@ -55,55 +55,53 @@ public class DriverFactory {
 	public final static void configure() {
 		InputStream inputStream = null;
 		InputStream extInputStream = null;
-	
+
 		try {
-			// Load from environment  
+			// Load from environment
 			String envPath = System.getProperty("esigate.config");
 			if (envPath != null) {
 				try {
-					LOG.info( "Scanning configuration {}", envPath);
+					LOG.info("Scanning configuration {}", envPath);
 					inputStream = new FileInputStream(new File(envPath));
 				} catch (FileNotFoundException e) {
-					LOG.error(
-							"Can't read file {} (from -Desigate.config)",
-							envPath, e);
+					LOG.error("Can't read file {} (from -Desigate.config)", envPath, e);
 				}
 			}
-			
-			
-			if (inputStream == null){
-				LOG.info( "Scanning configuration {}", "/esigate.properties");
+
+			if (inputStream == null) {
+				LOG.info("Scanning configuration {}", "/esigate.properties");
 				inputStream = DriverFactory.class.getResourceAsStream("/esigate.properties");
 			}
-	
+
 			// For backward compatibility
-			if (inputStream == null){
-				LOG.info( "Scanning configuration /{}/{}", DriverFactory.class.getPackage().getName().replace(".", "/"), "driver.properties");
+			if (inputStream == null) {
+				LOG.info("Scanning configuration /{}/{}", DriverFactory.class.getPackage().getName().replace(".", "/"),
+						"driver.properties");
 				inputStream = DriverFactory.class.getResourceAsStream("driver.properties");
 			}
-			if (inputStream == null){
-				LOG.info( "Scanning configuration {}", "/net/webassembletool/driver.properties");
+			if (inputStream == null) {
+				LOG.info("Scanning configuration {}", "/net/webassembletool/driver.properties");
 				inputStream = DriverFactory.class.getResourceAsStream("/net/webassembletool/driver.properties");
 			}
-	
+
 			if (inputStream == null)
 				throw new ConfigurationException("esigate.properties configuration file was not found in the classpath");
-	
+
 			// load driver-ext.properties if exists
-			LOG.info( "Scanning configuration {}", "/esigate-ext.properties");
+			LOG.info("Scanning configuration {}", "/esigate-ext.properties");
 			extInputStream = DriverFactory.class.getClassLoader().getResourceAsStream("/esigate-ext.properties");
-	
+
 			// For backward compatibility
 			if (extInputStream == null) {
-				LOG.info( "Scanning configuration {}", "/driver-ext.properties");
+				LOG.info("Scanning configuration {}", "/driver-ext.properties");
 				extInputStream = DriverFactory.class.getResourceAsStream("/driver-ext.properties");
 			}
-			if (extInputStream == null){
-				LOG.info( "Scanning configuration /{}/{}", DriverFactory.class.getPackage().getName().replace(".", "/"), "driver-ext.properties");
+			if (extInputStream == null) {
+				LOG.info("Scanning configuration /{}/{}", DriverFactory.class.getPackage().getName().replace(".", "/"),
+						"driver-ext.properties");
 				extInputStream = DriverFactory.class.getResourceAsStream("driver-ext.properties");
 			}
 
-		
 			Properties merged = new Properties();
 			if (inputStream != null) {
 				Properties props = new Properties();
@@ -163,7 +161,7 @@ public class DriverFactory {
 		}
 		// Merge with default properties
 		synchronized (INSTANCES) {
-			INSTANCES.clear();
+			INSTANCES.getInstances().clear();
 			for (Entry<String, Properties> entry : driversProps.entrySet()) {
 				String name = entry.getKey();
 				Properties properties = new Properties();
@@ -171,9 +169,11 @@ public class DriverFactory {
 				properties.putAll(entry.getValue());
 				configure(name, properties);
 			}
-			if (INSTANCES.get(DEFAULT_INSTANCE_NAME) == null && Parameters.REMOTE_URL_BASE.getValueString(defaultProperties) != null) {
+			if (INSTANCES.getInstances().get(DEFAULT_INSTANCE_NAME) == null
+					&& Parameters.REMOTE_URL_BASE.getValueString(defaultProperties) != null) {
 				configure(DEFAULT_INSTANCE_NAME, defaultProperties);
 			}
+
 		}
 	}
 
@@ -185,7 +185,36 @@ public class DriverFactory {
 	 * @param props
 	 */
 	public static void configure(String name, Properties props) {
-		INSTANCES.put(name, new Driver(name, props));
+		INSTANCES.getInstances().put(name, new Driver(name, props));
+
+		// Update mapping index.
+		INSTANCES = new IndexedInstances(INSTANCES.getInstances());
+	}
+
+	/**
+	 * Retrieve the Driver instance which should process the request as
+	 * described in the parameters, based on the mappings declared in
+	 * configuration.
+	 * 
+	 * @param scheme
+	 *            The scheme of the request : http or https
+	 * @param host
+	 *            The host of the request, as provided in the Host header of the
+	 *            HTTP protocol
+	 * @param url
+	 *            The requested url
+	 * @return
+	 * @throws HttpErrorPage
+	 */
+	public static Driver getInstanceFor(String scheme, String host, String url) throws HttpErrorPage {
+		for (UriMapping mapping : INSTANCES.getUrimappings().keySet()) {
+			if (mapping.matches(scheme, host, url)) {
+				return getInstance(INSTANCES.getUrimappings().get(mapping));
+			}
+		}
+
+		// If no match, return default instance.
+		throw new HttpErrorPage(404, "Not found", "No mapping defined for this url.");
 	}
 
 	/**
@@ -202,10 +231,11 @@ public class DriverFactory {
 		synchronized (INSTANCES) {
 			if (instanceName == null)
 				instanceName = DEFAULT_INSTANCE_NAME;
-			if (INSTANCES.isEmpty()) {
-				throw new ConfigurationException("Driver has not been configured and driver.properties file was not found");
+			if (INSTANCES.getInstances().isEmpty()) {
+				throw new ConfigurationException(
+						"Driver has not been configured and driver.properties file was not found");
 			}
-			Driver instance = INSTANCES.get(instanceName);
+			Driver instance = INSTANCES.getInstances().get(instanceName);
 			if (instance == null) {
 				throw new ConfigurationException("No configuration properties found for factory : " + instanceName);
 			}
@@ -233,7 +263,18 @@ public class DriverFactory {
 	 */
 	public final static void put(String instanceName, Driver instance) {
 		synchronized (INSTANCES) {
-			INSTANCES.put(instanceName, instance);
+			INSTANCES.getInstances().put(instanceName, instance);
+			// Update mapping index.
+			INSTANCES = new IndexedInstances(INSTANCES.getInstances());
 		}
 	}
+
+	/**
+	 * Ensure configuration has been loaded at least once. Helps to prevent
+	 * delay on first call because of initialization.
+	 */
+	public static void ensureConfigured() {
+		// Just trigger static init.
+	}
+
 }

@@ -33,14 +33,13 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 /**
- * Test the aggregator servlet for driver selection (url mapping) for both
+ * Test the proxy servlet for driver selection (url mapping) for both
  * web.xml configuration (legacy) and esigate.properties.
  * 
  * @author Nicolas Richeton
- * @deprecated Remove when {@link AggregatorServlet} is removed.
+ * 
  */
-@Deprecated
-public class AggregatorServletTest {
+public class ProxyServletTest {
 
 	protected class TestServletConfig implements ServletConfig {
 		public String getServletName() {
@@ -74,7 +73,7 @@ public class AggregatorServletTest {
 	 */
 	@Test
 	public void testConfig() throws ServletException {
-		AggregatorServlet servlet = new AggregatorServlet();
+		ProxyServlet servlet = new ProxyServlet();
 
 		// Setup Esigate
 		Properties p = new Properties();
@@ -108,7 +107,7 @@ public class AggregatorServletTest {
 		DriverFactory.configure(p);
 
 		// Init servlet
-		AggregatorServlet servlet = new AggregatorServlet();
+		ProxyServlet servlet = new ProxyServlet();
 		servlet.init(new TestServletConfig());
 
 		// Do testing
@@ -166,7 +165,7 @@ public class AggregatorServletTest {
 		p.setProperty("single." + Parameters.MAPPINGS, "*");
 		DriverFactory.configure(p);
 
-		AggregatorServlet servlet = new AggregatorServlet();
+		ProxyServlet servlet = new ProxyServlet();
 		ServletConfig conf =	Mockito.mock(ServletConfig.class);
 		Mockito.when(conf.getInitParameter("useMappings")).thenReturn("true");
 		servlet.init(conf);

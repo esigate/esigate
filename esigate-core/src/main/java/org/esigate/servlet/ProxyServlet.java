@@ -25,30 +25,50 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.esigate.DriverFactory;
 import org.esigate.HttpErrorPage;
+import org.esigate.servlet.impl.DriverSelector;
+import org.esigate.servlet.impl.RequestUrl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Servlet used to proxy requests from a remote application.
  * 
+ * <p>
+ * Parameters are :
+ * <ul>
+ * <li>provider : single provider name</li>
+ * <li>providers : comma-separated list of provider mappings based on host
+ * requested. Format is: host1=provider,host2=provider2</li>
+ * <li>useMappings (optional - BETA, testing only): true or false : use mappings
+ * from esigate.properties</li>
+ * </ul>
+ * 
  * @author Francois-Xavier Bonnet
+ * @author Nicolas Richeton
  */
 public class ProxyServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOG = LoggerFactory.getLogger(ProxyServlet.class);
-	private String provider;
+	private DriverSelector driverSelector = new DriverSelector();
+
+	/**
+	 * Get current Driver selector. This is mainly used for unit testing.
+	 * 
+	 * @return
+	 */
+	public DriverSelector getDriverSelector() {
+		return this.driverSelector;
+	}
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String relUrl = request.getRequestURI();
-		relUrl = relUrl.substring(request.getContextPath().length());
-		if (request.getServletPath() != null) {
-			relUrl = relUrl.substring(request.getServletPath().length());
-		}
-		LOG.debug("Proxying " + relUrl);
+	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException,
+			IOException {
+		String relUrl = RequestUrl.getRelativeUrl(request);
+		LOG.debug("Proxying {}", relUrl);
+
 		HttpServletMediator mediator = new HttpServletMediator(request, response, getServletContext());
 		try {
-			DriverFactory.getInstance(provider).proxy(relUrl, mediator.getHttpRequest());
+			this.driverSelector.selectProvider(request).proxy(relUrl, mediator.getHttpRequest());
 		} catch (HttpErrorPage e) {
 			mediator.sendResponse(e.getHttpResponse());
 		}
@@ -57,6 +77,19 @@ public class ProxyServlet extends HttpServlet {
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
-		provider = config.getInitParameter("provider");
+
+		// get selected provided from web.xml (deprecated)
+		this.driverSelector.setWebXmlProvider(config.getInitParameter("provider"));
+
+		// Load mappings from web.xml (deprecated)
+		this.driverSelector.setWebXmlProviders(config.getInitParameter("providers"));
+
+		this.driverSelector.setUseMappings("true".equalsIgnoreCase(config.getInitParameter("useMappings")));
+
+		// Force esigate configuration parsing to trigger errors right away (if
+		// any) and prevent delay on first call.
+		DriverFactory.ensureConfigured();
+
 	}
+
 }

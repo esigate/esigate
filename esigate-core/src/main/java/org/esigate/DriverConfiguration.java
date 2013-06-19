@@ -15,10 +15,14 @@
 
 package org.esigate;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
 import org.esigate.api.BaseUrlRetrieveStrategy;
+import org.esigate.impl2.UriMapping;
 import org.esigate.renderers.ResourceFixupRenderer;
 import org.esigate.url.IpHashBaseUrlRetrieveStrategy;
 import org.esigate.url.RoundRobinBaseUrlRetrieveStrategy;
@@ -43,6 +47,7 @@ public class DriverConfiguration {
 	private final String filter;
 	private final BaseUrlRetrieveStrategy baseUrlRetrieveStrategy;
 	private final boolean isVisibleBaseURLEmpty;
+	private final List<UriMapping> uriMappings;
 
 	public DriverConfiguration(String instanceName, Properties props) {
 		this.instanceName = instanceName;
@@ -58,7 +63,27 @@ public class DriverConfiguration {
 		} else {
 			this.fixMode = ResourceFixupRenderer.RELATIVE;
 		}
+		
+		this.uriMappings = parseMappings(props);
 		properties = props;
+	}
+
+	/**
+	 * Read the "Mappings" parameter and create the corresponding UriMapping
+	 * rules.
+	 * 
+	 * @param props
+	 * @return The mapping rules for this driver instance.
+	 */
+	private static List<UriMapping> parseMappings(Properties props) {
+		List<UriMapping> mappings = new ArrayList<UriMapping>();
+
+		Collection<String> mappingsParam = Parameters.MAPPINGS.getValueList(props);
+		for (String mappingParam : mappingsParam) {
+			mappings.add(UriMapping.create(mappingParam));
+		}
+
+		return mappings;
 	}
 
 	private BaseUrlRetrieveStrategy getBaseUrlRetrieveSession(Properties props) {
@@ -126,4 +151,12 @@ public class DriverConfiguration {
 		return baseUrlRetrieveStrategy;
 	}
 
+	/**
+	 * Get URI mappings for this driver instance.
+	 * 
+	 * @return
+	 */
+	public List<UriMapping> getUriMappings() {
+		return this.uriMappings;
+	}
 }
