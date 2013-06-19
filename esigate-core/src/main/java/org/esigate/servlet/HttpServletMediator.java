@@ -47,7 +47,26 @@ import org.esigate.util.UriUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This mediator converts esigate request/responses to Servlet
+ * request/responses.
+ * <p>
+ * When converting requests, a mediator instance is attached to the request and
+ * call be retrieved anytime in esigate code, usually to update session and
+ * cookies.
+ * 
+ * @author Francois-Xavier Bonnet
+ * @author Nicolas Richeton
+ * 
+ */
 public class HttpServletMediator implements ContainerRequestMediator {
+	private static final String WARN_SESSION_CREATION = "Cannot create session to store attribute {}. The attribute was discarded. "
+			+ "This usually means that esigate is configured "
+			+ "to store cookies in user session AND stale-while-revalidate is enabled "
+			+ "AND backend is sending a cookie update. "
+			+ "This configuration is unsupported. Please update configuration to turn off stale-while-revalidate "
+			+ "or discard cookies. ";
+	
 	private final HttpServletRequest request;
 	private final HttpServletResponse response;
 	private final ServletContext servletContext;
@@ -181,7 +200,12 @@ public class HttpServletMediator implements ContainerRequestMediator {
 
 	public void setSessionAttribute(String key, Serializable value) {
 		HttpSession session = request.getSession();
-		session.setAttribute(key, value);
+
+		if (session != null) {
+			session.setAttribute(key, value);
+		} else {
+			LOG.warn(WARN_SESSION_CREATION, key);
+		}
 	}
 
 	public Serializable getSessionAttribute(String key) {
