@@ -25,8 +25,8 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import org.esigate.impl2.IndexedInstances;
-import org.esigate.impl2.UriMapping;
+import org.esigate.impl.IndexedInstances;
+import org.esigate.impl.UriMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

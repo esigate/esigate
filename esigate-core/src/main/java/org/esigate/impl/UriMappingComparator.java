@@ -13,7 +13,7 @@
  *
  */
 
-package org.esigate.impl2;
+package org.esigate.impl;
 
 import java.util.Comparator;
 

@@ -22,7 +22,7 @@ import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
 import org.esigate.api.BaseUrlRetrieveStrategy;
-import org.esigate.impl2.UriMapping;
+import org.esigate.impl.UriMapping;
 import org.esigate.renderers.ResourceFixupRenderer;
 import org.esigate.url.IpHashBaseUrlRetrieveStrategy;
 import org.esigate.url.RoundRobinBaseUrlRetrieveStrategy;

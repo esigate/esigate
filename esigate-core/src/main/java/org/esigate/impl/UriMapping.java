@@ -12,7 +12,7 @@
  * limitations under the License.
  *
  */
-package org.esigate.impl2;
+package org.esigate.impl;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

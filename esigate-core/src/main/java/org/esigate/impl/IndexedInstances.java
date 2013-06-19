@@ -12,7 +12,7 @@
  * limitations under the License.
  *
  */
-package org.esigate.impl2;
+package org.esigate.impl;
 
 import java.util.LinkedHashMap;
 import java.util.List;
