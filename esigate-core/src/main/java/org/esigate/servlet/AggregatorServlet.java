@@ -25,6 +25,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.esigate.DriverFactory;
 import org.esigate.HttpErrorPage;
+import org.esigate.aggregator.AggregateRenderer;
+import org.esigate.esi.EsiRenderer;
 import org.esigate.servlet.impl.DriverSelector;
 import org.esigate.servlet.impl.RequestUrl;
 import org.slf4j.Logger;
@@ -76,7 +78,7 @@ public class AggregatorServlet extends HttpServlet {
 		// Process ressource
 		HttpServletMediator mediator = new HttpServletMediator(request, response, getServletContext());
 		try {
-			this.driverSelector.selectProvider(request).proxy(relUrl, mediator.getHttpRequest());
+			this.driverSelector.selectProvider(request).proxy(relUrl, mediator.getHttpRequest(), new AggregateRenderer(), new EsiRenderer());
 		} catch (HttpErrorPage e) {
 			mediator.sendResponse(e.getHttpResponse());
 		}
