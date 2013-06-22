@@ -94,9 +94,9 @@
 		</developer>
 	</developers>
 	<scm>
-		<connection>scm:svn:http://svn.code.sf.net/p/webassembletool/code/tags/esigate-4.0</connection>
-		<developerConnection>scm:svn:https://svn.code.sf.net/p/webassembletool/code/tags/esigate-4.0</developerConnection>
-		<url>http://svn.code.sf.net/p/webassembletool/code/tags/esigate-4.0</url>
+		<connection>scm:svn:https://svn.code.sf.net/p/webassembletool/code/branches/esigate-4.x</connection>
+		<developerConnection>scm:svn:svn+ssh://svn.code.sf.net/p/webassembletool/code/branches/esigate-4.x</developerConnection>
+		<url>https://svn.code.sf.net/p/webassembletool/code/branches/esigate-4.x</url>
 	</scm>
 	<build>
 		<pluginManagement>
