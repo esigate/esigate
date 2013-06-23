@@ -58,6 +58,8 @@ import org.esigate.http.MockHttpClient;
 import org.esigate.tags.BlockRenderer;
 import org.esigate.tags.TemplateRenderer;
 import org.esigate.test.TestUtils;
+import org.esigate.test.http.HttpRequestBuilder;
+import org.esigate.test.http.HttpResponseBuilder;
 import org.esigate.util.HttpRequestHelper;
 
 public class DriverTest extends TestCase {
@@ -751,4 +753,72 @@ public class DriverTest extends TestCase {
         Assert.assertEquals(1, mediator.getCookies().length );
         Assert.assertEquals( "/", mediator.getCookies()[0].getPath() );
     }
+	
+	/**
+	 * 0000174: Redirect location with default port specified are incorrectly
+	 * rewritten when preserveHost=true
+	 * <p>
+	 * https://sourceforge.net/apps/mantisbt/webassembletool/view.php?id=174
+	 * 
+	 * <p>
+	 * Issue with default ports, which results in invalid url creation.
+	 * 
+	 * @throws Exception
+	 */
+	public void testRewriteRedirectResponseWithDefaultPortSpecifiedInLocation() throws Exception {
+		Properties properties = new Properties();
+		properties.put(Parameters.REMOTE_URL_BASE, "http://www.foo.com:8080");
+		properties.put(Parameters.PRESERVE_HOST, "true");
+		HttpResponse response = new BasicHttpResponse(new ProtocolVersion("HTTP", 1, 1),
+				HttpStatus.SC_MOVED_TEMPORARILY, "Found");
+		// The backend server sets the port even if default (OK it should not
+		// but some servers do it)
+		response.addHeader("Location", "http://www.foo.com:80/foo/bar");
+		   MockHttpClient mockHttpClient = new MockHttpClient();
+	        
+		   mockHttpClient.setResponse(response);
+		Driver driver = createMockDriver(properties, mockHttpClient);
+		// HttpServletMediator will put the default port in the original request
+		// URI even if
+		// it is the default port for this protocol:
+		// http://www.foo.com:80/foo
+		request = TestUtils.createRequest("http://www.foo.com:80/foo");
+		// HttpClientHelper will use the Host
+		// header to rewrite the request sent to the backend
+		// http://www.foo.com/foo
+		driver.proxy("/foo", request);
+		// The test initially failed with an invalid Location:
+		// http://www.foo.com:80:80/foo/bar
+		assertEquals("http://www.foo.com:80/foo/bar", TestUtils.getResponse(request).getFirstHeader("Location").getValue());
+	}
+
+	/**
+	 * Ensure default ports are not added by esigate.
+	 * 
+	 * @throws Exception
+	 */
+	public void testRewriteRedirectResponseWithLocation() throws Exception {
+		Properties properties = new Properties();
+		properties.put(Parameters.REMOTE_URL_BASE, "http://127.0.0.1");
+		properties.put(Parameters.PRESERVE_HOST, "true");
+
+		   MockHttpClient mockHttpClient = new MockHttpClient();
+	        
+		   mockHttpClient.setHttpResponseExecutor(new HttpRequestExecutor() {
+	            @Override
+	            public HttpResponse execute(HttpRequest request, HttpClientConnection conn, HttpContext context)
+	                    throws IOException, HttpException {if (!request.getLastHeader("Host").getValue().equals("www.foo.com"))
+					throw new IllegalArgumentException("Host must be www.foo.com");
+				return new HttpResponseBuilder().status(HttpStatus.SC_MOVED_TEMPORARILY).entity("Found")
+						.header("Location", "http://www.foo.com").build();
+			}
+		});
+		Driver driver = createMockDriver(properties, mockHttpClient);
+
+		HttpEntityEnclosingRequest request1 = new HttpRequestBuilder().mockMediator().uri("http://www.foo.com:80").build();
+		assertEquals("www.foo.com", request1.getLastHeader("Host").getValue());
+		
+		driver.proxy("", request1);
+		assertEquals("http://www.foo.com", TestUtils.getResponse(request1).getFirstHeader("Location").getValue());
+	}
 }
