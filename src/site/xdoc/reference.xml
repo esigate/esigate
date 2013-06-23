@@ -1723,6 +1723,12 @@ discardCookies=*
 						<td>500</td>
 						<td>Internal server error</td>
 					</tr>
+					
+					<tr>
+						<td>No mapping defined for the current request (useMappings=true)</td>
+						<td>404</td>
+						<td>Not found</td>
+					</tr>
 				</table>
 			</subsection>
 			<subsection name="Handling errors with ESIGate">
