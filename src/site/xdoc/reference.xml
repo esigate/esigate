@@ -14,7 +14,7 @@
 			<subsection name="Fragments and templates">
 				<p>
 					Any web application can be used to provide html fragments or page templates 
-					for other applications. Fragements are defined using ESI tags.
+					for other applications. Fragments are defined using ESI tags.
 				</p>
 			</subsection>
 			<subsection name="Cross technologies">
@@ -166,17 +166,68 @@ aggregated2.remoteUrlBase=http://application2/
 </web-app>
 				]]></source> 
 	        </subsection>
+	        <subsection name="Configure mappings in esigate.properties (BETA)">
+	        <p>Mappings can be defined in esigate.properties. This makes esigate.properties the only place for configuration. 
+	        This feature is available in 4.1 for testing and will be available for everyone in 5.0. This feature is disabled by default.
+	        </p>
+	        <p>This methods has several benefits : 
+	        </p>
+	        <ul>
+	        <li>Since esigate.properties can be located every where on the file system (-Desigate.config=) and web.xml no longer need to be modified, the standard esigate.war and esigate-server can be used without modification.</li>
+	        <li>Configuration and mappings can be reloaded at runtime while serving requests, without restarting the container</li>
+	        </ul>
+	        <p>Enable this feature with useMappings. Be sure to remove provider and providers parameters :</p>
+	           	<source><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
+<web-app>
+	<servlet>
+		<servlet-name>esigate</servlet-name>
+		<servlet-class>org.esigate.servlet.ProxyServlet</servlet-class>
+		<init-param>
+			<param-name>useMappings</param-name>
+			<param-value>true</param-value>
+			<description>Enable mappings handling using esigate.properties</description>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>esigate</servlet-name>
+		<url-pattern>/*</url-pattern>
+	</servlet-mapping>
+</web-app>
+				]]></source> 
+	        <p>Then configure mappings in esigate.properties :</p>
+  	<source><![CDATA[
+# Sample 1 : process all urls	        
+provider1.remoteUrlBase=http://host1/
+provider1.mapping=/*
+
+# Sample 2 : virtual host configuration
+# Process requests made for myhost 
+provider2.remoteUrlBase=http://host2/
+provider2.mapping=http://myhost/* 
+
+# Sample 3 : Process all php files
+provider3.remoteUrlBase=http://host3/
+provider3.mapping=*.php
+
+# Sample 4 : Process all files in css and images directories
+theme.remoteUrlBase=http://host4/
+theme.mapping=/css/*, /images/*
+	]]></source> 
+	        </subsection>
 		</section>
 		<section name="Configuration">
 		<subsection name="Configuration file">
 			<p>
 				ESIGate default behavior is to load a configuration file from
-				the	classpath /esigate.properties
+				the	classpath "/esigate.properties"
 			</p>
 			<p>
 				Alternatively you can use method
 				<code>org.esigate.DriverFactory.configure(Properties)
-				</code>
+				</code> or use a JVM property <code>-Desigate.config=&lt;path&gt;</code>
 				.
 			</p>
 		</subsection>
@@ -197,6 +248,23 @@ aggregated2.remoteUrlBase=http://application2/
 						When <a href="#Load_balancing">load-balancing</a> (remote application runs on several servers), use a comma-separated list.
 					</td>
 					<td>Yes</td>
+					<td>-</td>
+				</tr>
+				<tr>
+					<td>mapping</td>
+					<td>
+						Comma-separated list of URL patterns which are handled by this provider. Supported patterns are : 
+						<ul>
+						<li>*</li>
+						<li>/*</li>
+						<li>/*.ext</li>
+						<li>/path/*</li>
+						<li>/path/*.ext</li>
+						<li>http://host:port/*</li>
+						</ul>
+						This directive is BETA and must be enabled manually (see <a href="Configure_mappings_in_esigate.properties_BETA">Configure mappings in esigate.properties (BETA)</a>).
+					</td>
+					<td>No</td>
 					<td>-</td>
 				</tr>
 				<tr>
