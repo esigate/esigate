@@ -95,7 +95,7 @@
 	</developers>
 	<scm>
 		<connection>scm:svn:https://svn.code.sf.net/p/webassembletool/code/tags/esigate-4.1-SNAPSHOT</connection>
-		<developerConnection>scm:svn:svn+ssh://svn.code.sf.net/p/webassembletool/code/tags/esigate-4.1-SNAPSHOT</developerConnection>
+		<developerConnection>scm:svn:http://svn.code.sf.net/p/webassembletool/code/tags/esigate-4.1-SNAPSHOT</developerConnection>
 		<url>https://svn.code.sf.net/p/webassembletool/code/tags/esigate-4.1-SNAPSHOT</url>
 	</scm>
 	<build>
