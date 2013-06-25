@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project xmlns="http://maven.apache.org/DECORATION/1.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/DECORATION/1.1.0 http://maven.apache.org/xsd/decoration-1.1.0.xsd"
+  name="ESIGate - ESI reverse proxy, CMS integration, Remote templating">
+	<bannerLeft>
+		<name>ESIGate</name>
+		<src>images/logo.jpg</src>
+		<href>http://www.esigate.org/</href>
+		<alt>Get ESIGate at SourceForge.net. Fast, secure and Free Open Source
+			software downloads</alt>
+	</bannerLeft>
+	<version position="left" />
+	<poweredBy>
+	  <logo href="http://sourceforge.net/projects/webassembletool" width="80" height="15"
+	    name="Hosted by SourceForge" img="http://sflogo.sourceforge.net/sflogo.php?group_id=209844&amp;type=8"
+	    alt="Get Website assembling toolkit at SourceForge.net. Fast, secure and Free Open Source software downloads" />
+	</poweredBy>
+	<skin>
+		<groupId>org.esigate.maven</groupId>
+		<artifactId>esigate-maven-skin</artifactId>
+		<version>3.6</version>
+	</skin>
+	<body>
+		<head>
+			<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-27343319-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+		</head>
+
+		<links>
+			<item name="Change log"
+				href="https://sourceforge.net/apps/mantisbt/webassembletool/changelog_page.php" />
+			<item name="Roadmap"
+				href="https://sourceforge.net/apps/mantisbt/webassembletool/roadmap_page.php" />
+			<item name="Stats (ohloh)" href="http://www.ohloh.net/p/webassembletool" />
+		</links>
+
+		<menu name="Download">
+			<item href="http://sourceforge.net/project/showfiles.php?group_id=209844"
+				name="Download" />
+		</menu>
+		<menu name="Documentation">
+			<item href="quickstart.html" name="Quick start" />
+			<item href="reference.html" name="Reference documentation" />
+			<item href="external-resources.html" name="External resources" />
+			<item href="upgrade.html" name="Upgrade" />
+		</menu>
+
+		<menu ref="reports" />
+
+		<menu name="Modules">
+			<item href="esigate-core/index.html" name="esigate-core" />
+			<item href="esigate-cas/index.html" name="esigate-cas" />
+			<item href="esigate-war/index.html" name="esigate-war" />
+			<item href="esigate-server/index.html" name="esigate-server" />
+		</menu>
+
+	</body>
+</project>

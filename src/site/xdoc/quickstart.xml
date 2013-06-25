@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+	<properties>
+		<title>Quick start</title>
+		<author email="francois-xavier.bonnet@centraliens.net">Francois-Xavier Bonnet</author>
+	</properties>
+	<body>
+		<section name="Goals">
+			<p>
+				Imagine you have to create a specific module that has to integrate inside an existing
+				web site.
+				This web site was built with some Content Management System.
+				It would be easier and much faster for you to develop it as an independent standalone
+				application than working with the CMS and all the constraints it may bring to you.
+			</p>
+			<p>
+				For this tutorial we will use a very simple Hello World application. If you want to test,
+				make your own application (it could be written in any language). Let's assume the application
+				is running on <a href="http://localhost:8080/hello/">http://localhost:8080/hello/</a>
+			</p>
+			<p>
+				<img src="hello1.png" alt="Hello World application screenshot 1" />
+				<img src="hello2.png" alt="Hello World application screenshot 2" />
+			</p>
+			<p>
+				For the CMS we will use existing pages from ESIGate web site:
+				<a href="http://www.esigate.org/examples/templates/sparkle/template.html">http://www.esigate.org/examples/templates/sparkle/template.html</a>
+			</p>
+			<p>
+				<img src="template.png" alt="Template application screenshot" />
+			</p>
+		</section>
+		<section name="Download ESIGate">
+			<p>
+				To be quick here we will use the esigate-server package included in the distribution.
+				esigate-server is a pre-packaged esigate web application and jetty server for testing and development purposes. Note that ESIGate
+				runs as a servlet so later you will be able to run it in production on any servlet container
+				like Tomcat for example.
+			</p>
+		</section>
+		<section name="Configure ESIGate">
+			<p>
+				ESIGate needs a configuration file "esigate.properties" where you define the base Urls
+				of your applications:
+			</p>
+<source>
+esigate.remoteUrlBase=http://localhost:8080/
+</source>
+		</section>
+		<section name="Run ESIGate">
+			<p>
+				Now we put ESIGate server and esigate.properties in the same folder, open a console on this folder and launch the following command:
+			</p>
+<source>
+java -Desigate.config=esigate.properties -Djetty.port=8081 -jar esigate-server-4.0.jar start
+</source>
+			<p>
+				You should now have ESIGate running on port 8081. Let's check by calling in a browser <a href="http://localhost:8081/hello/">http://localhost:8081/hello/</a>.
+				You should see exactly your application except that we are one port 8081 (your application is on port 8080) (Ok for now, nothing spectacular ;-)
+			</p>
+		</section>
+		<section name="Use an ESI template">
+			<p>
+				We are going to use <a href="http://www.esigate.org/examples/templates/sparkle/template.html">http://www.esigate.org/examples/templates/sparkle/template.html</a>
+				page as a template for the pages of our hello application.
+			</p>
+			<p>
+				To do this, we will have to add some few ESI tags in our code:
+			</p>
+<source><![CDATA[
+]]><strong><![CDATA[<esi:include src="http://www.esigate.org/examples/templates/sparkle/template.html">]]></strong><![CDATA[
+<html>
+<head>
+]]><strong><![CDATA[<esi:replace fragment="head">]]></strong><![CDATA[
+<title>What is your name?</title>
+]]><strong><![CDATA[</esi:replace>]]></strong><![CDATA[
+</head>
+<body>
+]]><strong><![CDATA[<esi:replace fragment="body">]]></strong><![CDATA[
+Hello <%=request.getParameter("name")%>!
+]]><strong><![CDATA[</esi:replace>]]></strong><![CDATA[
+</body>
+</html>
+]]><strong><![CDATA[</esi:include>]]></strong><![CDATA[
+]]></source>
+			<p>
+				And for the second page:
+			</p>
+<source><![CDATA[
+]]><strong><![CDATA[<esi:include src="http://www.esigate.org/examples/templates/sparkle/template.html">]]></strong><![CDATA[
+<html>
+<head>
+]]><strong><![CDATA[<esi:replace fragment="head">]]></strong><![CDATA[
+<title>Hello!</title>
+]]><strong><![CDATA[</esi:replace>]]></strong><![CDATA[
+</head>
+<body>
+]]><strong><![CDATA[<esi:replace fragment="body">]]></strong><![CDATA[
+<form action="hello.jsp" method="GET">
+What is your name?
+<input type="text" name="name" />
+<input type="submit" value="ok" />
+</form>
+]]><strong><![CDATA[</esi:replace>]]></strong><![CDATA[
+</body>
+</html>
+]]><strong><![CDATA[</esi:include>]]></strong><![CDATA[
+]]></source>
+			<p>
+				This tells ESIGate to include our template page and to replace some placeholders with our code. If you look at the source code of page
+				<a href="http://www.esigate.org/examples/templates/sparkle/template.html">http://www.esigate.org/examples/templates/sparkle/template.html</a>
+				you will notice that the placeholders are already there, for exemple for the "head" section: 
+			</p>
+<source><![CDATA[
+...
+]]><strong><![CDATA[<esi:fragment name="head">]]></strong><![CDATA[
+<title>Sparkle by Free Css Templates</title>
+]]><strong><![CDATA[<esi:fragment>]]></strong><![CDATA[
+...
+]]></source>
+		</section>
+		<section name ="Test">
+			<p>
+				Now we can test again on <a href="http://localhost:8081/hello/">http://localhost:8081/hello/</a>
+			</p>
+			<p>
+				<img src="hello1_integrated.png" alt="Hello World application screenshot 1 integrated with template" />
+				<img src="hello2_integrated.png" alt="Hello World application screenshot 2 integrated with template" />
+			</p>
+			<p>
+				The 2 applications are now integrated but remain separate applications that can be developed, tested and deployed separately. In addition ESIGate includes a cache that
+				will make the integrated application very fast.
+			</p>
+			<p>
+				ESIGate can be used for much more complex cases with several applications that have to be seen as a single one by users.
+				Have a look at the <a href="reference.html">reference documentation</a> for more information.
+			</p>
+		
+		 <div id="disqus_thread"></div>
+    <script type="text/javascript">
+<![CDATA[  
+        var disqus_shortname = 'esigate';
+
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+        
+      //  ]]>
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+   	
+   	</section>
+	</body>
+</document>
