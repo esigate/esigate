@@ -203,8 +203,9 @@ public class ResourceFixupRenderer implements Renderer {
 			LOG.debug("fix absolute url: {} -> {} ", urlParam, url);
 			return url;
 		}
-		// Keep absolute and javascript urls untouched.
-		if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("#") || url.startsWith("javascript:")) {
+		
+		// Keep absolute, protocol-absolute and javascript urls untouched.
+		if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("//") || url.startsWith("#") || url.startsWith("javascript:")) {
 			LOG.debug("keeping absolute url: {}", url);
 			return url;
 		}
