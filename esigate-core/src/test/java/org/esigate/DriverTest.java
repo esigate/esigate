@@ -46,6 +46,7 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicHttpResponse;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpRequestExecutor;
+import org.apache.http.util.EntityUtils;
 import org.esigate.api.ContainerRequestMediator;
 import org.esigate.cookie.CookieManager;
 import org.esigate.esi.EsiRenderer;
@@ -68,24 +69,30 @@ public class DriverTest extends TestCase {
 	@Override
 	protected void setUp() throws Exception {
 		MockDriver provider = new MockDriver("mock");
-		provider.addResource("/testBlock", "abc some<!--$beginblock$A$-->some text goes here<!--$endblock$A$--> cdf hello");
-		provider.addResource("/testTemplateFullPage", "some <!--$beginparam$key$-->some hidden text goes here<!--$endparam$key$--> printed");
-		provider.addResource("/testTemplate", "abc some<!--$begintemplate$A$-->some text goes here<!--$endtemplate$A$--> cdf hello");
+		provider.addResource("/testBlock",
+				"abc some<!--$beginblock$A$-->some text goes here<!--$endblock$A$--> cdf hello");
+		provider.addResource("/testTemplateFullPage",
+				"some <!--$beginparam$key$-->some hidden text goes here<!--$endparam$key$--> printed");
+		provider.addResource("/testTemplate",
+				"abc some<!--$begintemplate$A$-->some text goes here<!--$endtemplate$A$--> cdf hello");
 		request = TestUtils.createRequest();
 	}
 
 	public void testRenderBlock() throws IOException, HttpErrorPage {
 		Writer out = new StringWriter();
-		DriverFactory.getInstance("mock").render("/testBlock", null, out, request, new BlockRenderer("A", "/testBlock"));
+		DriverFactory.getInstance("mock")
+				.render("/testBlock", null, out, request, new BlockRenderer("A", "/testBlock"));
 
 		assertEquals("some text goes here", out.toString());
 
 		out = new StringWriter();
-		DriverFactory.getInstance("mock").render("$(vartestBlock)", null, out, request, new BlockRenderer("A", "$(vartestBlock)"));
+		DriverFactory.getInstance("mock").render("$(vartestBlock)", null, out, request,
+				new BlockRenderer("A", "$(vartestBlock)"));
 		assertEquals("some text goes here", out.toString());
 
 		out = new StringWriter();
-		DriverFactory.getInstance("mock").render("/$(vartest)$(varBlock)", null, out, request, new BlockRenderer("A", "/$(vartest)$(varBlock)"));
+		DriverFactory.getInstance("mock").render("/$(vartest)$(varBlock)", null, out, request,
+				new BlockRenderer("A", "/$(vartest)$(varBlock)"));
 		assertEquals("some text goes here", out.toString());
 
 	}
@@ -95,7 +102,8 @@ public class DriverTest extends TestCase {
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put("key", "'value'");
 		params.put("some other key", "'another value'");
-		DriverFactory.getInstance("mock").render("/testTemplateFullPage", null, out, request, new TemplateRenderer(null, params, "/testTemplateFullPage"));
+		DriverFactory.getInstance("mock").render("/testTemplateFullPage", null, out, request,
+				new TemplateRenderer(null, params, "/testTemplateFullPage"));
 		assertFalse(out.toString().contains("key"));
 		assertTrue(out.toString().contains("'value'"));
 		assertFalse(out.toString().contains("some other key"));
@@ -104,11 +112,13 @@ public class DriverTest extends TestCase {
 
 	public void testRenderTemplate() throws IOException, HttpErrorPage {
 		StringWriter out = new StringWriter();
-		DriverFactory.getInstance("mock").render("/testTemplate", null, out, request, new TemplateRenderer("A", null, "/testTemplate"));
+		DriverFactory.getInstance("mock").render("/testTemplate", null, out, request,
+				new TemplateRenderer("A", null, "/testTemplate"));
 		assertEquals("some text goes here", out.toString());
 
 		out = new StringWriter();
-		DriverFactory.getInstance("mock").render("/test$(varTemplate)", null, out, request, new TemplateRenderer("A", null, "/test$(varTemplate)"));
+		DriverFactory.getInstance("mock").render("/test$(varTemplate)", null, out, request,
+				new TemplateRenderer("A", null, "/test$(varTemplate)"));
 		assertEquals("some text goes here", out.toString());
 
 	}
@@ -254,7 +264,8 @@ public class DriverTest extends TestCase {
 	private Driver createMockDriver(Properties properties, HttpClient httpClient, String name) {
 		CookieManager cookieManager = ExtensionFactory.getExtension(properties, Parameters.COOKIE_MANAGER, null);
 
-		HttpClientHelper httpClientHelper = new HttpClientHelper(new EventManager(), cookieManager, httpClient, properties);
+		HttpClientHelper httpClientHelper = new HttpClientHelper(new EventManager(), cookieManager, httpClient,
+				properties);
 		Driver driver = new Driver(name, properties, httpClientHelper);
 		DriverFactory.put(name, driver);
 		return driver;
@@ -265,12 +276,14 @@ public class DriverTest extends TestCase {
 		properties.put(Parameters.REMOTE_URL_BASE.name, "http://www.foo.com:8080/");
 		request = TestUtils.createRequest("http://www.bar.com/foo/");
 		MockHttpClient mockHttpClient = new MockHttpClient();
-		HttpResponse response = new BasicHttpResponse(new ProtocolVersion("HTTP", 1, 1), HttpStatus.SC_MOVED_TEMPORARILY, "Found");
+		HttpResponse response = new BasicHttpResponse(new ProtocolVersion("HTTP", 1, 1),
+				HttpStatus.SC_MOVED_TEMPORARILY, "Found");
 		response.addHeader("Location", "http://www.foo.com:8080/somewhere/");
 		mockHttpClient.setResponse(response);
 		Driver driver = createMockDriver(properties, mockHttpClient);
 		driver.proxy("/foo/", request);
-		assertEquals("http://www.bar.com/somewhere/", TestUtils.getResponse(request).getFirstHeader("Location").getValue());
+		assertEquals("http://www.bar.com/somewhere/", TestUtils.getResponse(request).getFirstHeader("Location")
+				.getValue());
 	}
 
 	/**
@@ -294,7 +307,8 @@ public class DriverTest extends TestCase {
 		properties.put(Parameters.USE_CACHE.name, true);
 
 		MockHttpClient mockHttpClient = new MockHttpClient();
-		HttpResponse response = new BasicHttpResponse(new ProtocolVersion("HTTP", 1, 1), HttpStatus.SC_NOT_MODIFIED, "Not Modified");
+		HttpResponse response = new BasicHttpResponse(new ProtocolVersion("HTTP", 1, 1), HttpStatus.SC_NOT_MODIFIED,
+				"Not Modified");
 		response.addHeader("Etag", "b5e3f57c0e84fc7a197b849fdfd3d407");
 		response.addHeader("Date", "Thu, 13 Dec 2012 07:28:01 GMT");
 		mockHttpClient.setResponse(response);
@@ -338,7 +352,8 @@ public class DriverTest extends TestCase {
 		properties.put(Parameters.TTL.name, "43200");
 
 		MockHttpClient mockHttpClient = new MockHttpClient();
-		HttpResponse response = new BasicHttpResponse(new ProtocolVersion("HTTP", 1, 1), HttpStatus.SC_NOT_MODIFIED, "Not Modified");
+		HttpResponse response = new BasicHttpResponse(new ProtocolVersion("HTTP", 1, 1), HttpStatus.SC_NOT_MODIFIED,
+				"Not Modified");
 		response.addHeader("Etag", "a86ecd6cc6d361776ed05f063921aa34");
 		response.addHeader("Date", "Thu, 13 Dec 2012 08:55:37 GMT");
 		response.addHeader("Cache-Control", "max-age=2051, public");
@@ -376,12 +391,14 @@ public class DriverTest extends TestCase {
 		properties.put(Parameters.USE_CACHE.name, true);
 
 		MockHttpClient mockHttpClient = new MockHttpClient();
-		HttpResponse response = new BasicHttpResponse(new ProtocolVersion("HTTP", 1, 1), HttpStatus.SC_NOT_MODIFIED, "Not Modified");
+		HttpResponse response = new BasicHttpResponse(new ProtocolVersion("HTTP", 1, 1), HttpStatus.SC_NOT_MODIFIED,
+				"Not Modified");
 		response.addHeader("Etag", "a86ecd6cc6d361776ed05f063921aa34");
 		response.addHeader("Date", "Thu, 13 Dec 2012 08:55:37 GMT");
 		response.addHeader("Cache-Control", "max-age=2051, public, must-revalidate, proxy-revalidate");
 		response.addHeader("Expires", "Thu, 13 Dec 2012 09:29:48 GMT");
-		response.addHeader("Set-Cookie", "w3tc_referrer=http%3A%2F%2Fblog.richeton.com%2Fcategory%2Fcomputer%2Fwat%2F; path=/");
+		response.addHeader("Set-Cookie",
+				"w3tc_referrer=http%3A%2F%2Fblog.richeton.com%2Fcategory%2Fcomputer%2Fwat%2F; path=/");
 		mockHttpClient.setResponse(response);
 		Driver driver = createMockDriver(properties, mockHttpClient);
 
@@ -399,7 +416,8 @@ public class DriverTest extends TestCase {
 		response.addHeader("Date", "Thu, 13 Dec 2012 08:55:37 GMT");
 		response.addHeader("Cache-Control", "max-age=2051, public, must-revalidate, proxy-revalidate");
 		response.addHeader("Expires", "Thu, 13 Dec 2012 09:29:48 GMT");
-		response.addHeader("Set-Cookie", "w3tc_referrer=http%3A%2F%2Fblog.richeton.com%2Fcategory%2Fcomputer%2Fwat%2F; path=/");
+		response.addHeader("Set-Cookie",
+				"w3tc_referrer=http%3A%2F%2Fblog.richeton.com%2Fcategory%2Fcomputer%2Fwat%2F; path=/");
 		response.setEntity(new StringEntity("test"));
 		mockHttpClient.setResponse(response);
 
@@ -434,7 +452,8 @@ public class DriverTest extends TestCase {
 
 		mockHttpClient.setHttpResponseExecutor(new HttpRequestExecutor() {
 			@Override
-			public HttpResponse execute(HttpRequest request, HttpClientConnection conn, HttpContext context) throws IOException, HttpException {
+			public HttpResponse execute(HttpRequest request, HttpClientConnection conn, HttpContext context)
+					throws IOException, HttpException {
 				Assert.assertEquals("localhost.mydomain.fr", request.getFirstHeader("Host").getValue());
 				Assert.assertTrue("Cookie must be forwarded", request.containsHeader("Cookie"));
 				return new BasicHttpResponse(new ProtocolVersion("HTTP", 1, 1), HttpStatus.SC_OK, "OK");
@@ -492,11 +511,11 @@ public class DriverTest extends TestCase {
 
 	}
 
-	
 	/**
-	 * This test ensure Fetch events are fired when cache is disabled. 
+	 * This test ensure Fetch events are fired when cache is disabled.
 	 * <p>
-	 * It uses {@link DefaultCharset} extension which processes the Contet-Type header on post-fetch events.
+	 * It uses {@link DefaultCharset} extension which processes the Contet-Type
+	 * header on post-fetch events.
 	 * 
 	 * @throws Exception
 	 */
@@ -506,7 +525,8 @@ public class DriverTest extends TestCase {
 		properties.put(Parameters.EXTENSIONS.name, DefaultCharset.class.getName());
 		properties.put(Parameters.USE_CACHE.name, "false");
 
-		HttpResponse response = new BasicHttpResponse(new ProtocolVersion("HTTP", 1, 1), HttpStatus.SC_OK, "Not Modified");
+		HttpResponse response = new BasicHttpResponse(new ProtocolVersion("HTTP", 1, 1), HttpStatus.SC_OK,
+				"Not Modified");
 		response.addHeader("Content-Type", "text/html");
 
 		MockHttpClient mockHttpClient = new MockHttpClient();
@@ -518,9 +538,10 @@ public class DriverTest extends TestCase {
 		request = TestUtils.createRequest("http://www.bar142-2.com/foobar142-2/");
 		driver.proxy("/foobar142-2/", request);
 		assertEquals(200, TestUtils.getResponse(request).getStatusLine().getStatusCode());
-		assertEquals("text/html; charset=ISO-8859-1", TestUtils.getResponse(request).getHeaders("Content-Type")[0].getValue());
+		assertEquals("text/html; charset=ISO-8859-1",
+				TestUtils.getResponse(request).getHeaders("Content-Type")[0].getValue());
 	}
-	
+
 	/**
 	 * 0000135: Special characters are lost when including a fragment with no
 	 * charset specified into UTF-8 page
@@ -643,117 +664,119 @@ public class DriverTest extends TestCase {
 		}
 		assertEquals("All the connections should have been closed", 0, mockHttpClient.getOpenConnections());
 	}
-	
+
 	public void testForwardCookiesWithPortsAndPreserveHost() throws Exception {
-        Properties properties = new Properties();
-        properties.put(Parameters.REMOTE_URL_BASE.name, "http://localhost:8080/"); 
-        properties.put(Parameters.PRESERVE_HOST.name, "true");
-        properties.put(Parameters.FORWARD_COOKIES.name, "*");
+		Properties properties = new Properties();
+		properties.put(Parameters.REMOTE_URL_BASE.name, "http://localhost:8080/");
+		properties.put(Parameters.PRESERVE_HOST.name, "true");
+		properties.put(Parameters.FORWARD_COOKIES.name, "*");
 
-        MockHttpClient mockHttpClient = new MockHttpClient();
-        mockHttpClient.setHttpResponseExecutor(new HttpRequestExecutor() {
-            @Override
-            public HttpResponse execute(HttpRequest request, HttpClientConnection conn, HttpContext context)
-                    throws IOException, HttpException {
-                Assert.assertNotNull(request.getFirstHeader("Cookie"));
-                Assert.assertEquals("JSESSIONID=926E1C6A52804A625DFB0139962D4E13", request.getFirstHeader("Cookie").getValue());
-                return new BasicHttpResponse(new ProtocolVersion("HTTP", 1, 1), HttpStatus.SC_OK, "OK");
-            }
-        });
-        Driver driver = createMockDriver(properties, mockHttpClient);
+		MockHttpClient mockHttpClient = new MockHttpClient();
+		mockHttpClient.setHttpResponseExecutor(new HttpRequestExecutor() {
+			@Override
+			public HttpResponse execute(HttpRequest request, HttpClientConnection conn, HttpContext context)
+					throws IOException, HttpException {
+				Assert.assertNotNull(request.getFirstHeader("Cookie"));
+				Assert.assertEquals("JSESSIONID=926E1C6A52804A625DFB0139962D4E13", request.getFirstHeader("Cookie")
+						.getValue());
+				return new BasicHttpResponse(new ProtocolVersion("HTTP", 1, 1), HttpStatus.SC_OK, "OK");
+			}
+		});
+		Driver driver = createMockDriver(properties, mockHttpClient);
 
-        request = TestUtils.createRequest("http://127.0.0.1:8081/foobar.jsp");
-        BasicClientCookie cookie = new BasicClientCookie("_JSESSIONID", "926E1C6A52804A625DFB0139962D4E13");
-        TestUtils.addCookie(cookie, request);
+		request = TestUtils.createRequest("http://127.0.0.1:8081/foobar.jsp");
+		BasicClientCookie cookie = new BasicClientCookie("_JSESSIONID", "926E1C6A52804A625DFB0139962D4E13");
+		TestUtils.addCookie(cookie, request);
 
-        driver.proxy("/foobar.jsp", request);
-    }
-	
+		driver.proxy("/foobar.jsp", request);
+	}
+
 	public void testForwardCookiesWithPorts() throws Exception {
-        Properties properties = new Properties();
-        properties.put(Parameters.REMOTE_URL_BASE.name, "http://localhost:8080/"); 
-        properties.put(Parameters.PRESERVE_HOST.name, "false");
-        properties.put(Parameters.FORWARD_COOKIES.name, "*");
+		Properties properties = new Properties();
+		properties.put(Parameters.REMOTE_URL_BASE.name, "http://localhost:8080/");
+		properties.put(Parameters.PRESERVE_HOST.name, "false");
+		properties.put(Parameters.FORWARD_COOKIES.name, "*");
 
-        MockHttpClient mockHttpClient = new MockHttpClient();
-        mockHttpClient.setHttpResponseExecutor(new HttpRequestExecutor() {
-            @Override
-            public HttpResponse execute(HttpRequest request, HttpClientConnection conn, HttpContext context)
-                    throws IOException, HttpException {
-                Assert.assertNotNull(request.getFirstHeader("Cookie"));
-                Assert.assertEquals("JSESSIONID=926E1C6A52804A625DFB0139962D4E13", request.getFirstHeader("Cookie").getValue());
-                return new BasicHttpResponse(new ProtocolVersion("HTTP", 1, 1), HttpStatus.SC_OK, "OK");
-            }
-        });
-        Driver driver = createMockDriver(properties, mockHttpClient);
+		MockHttpClient mockHttpClient = new MockHttpClient();
+		mockHttpClient.setHttpResponseExecutor(new HttpRequestExecutor() {
+			@Override
+			public HttpResponse execute(HttpRequest request, HttpClientConnection conn, HttpContext context)
+					throws IOException, HttpException {
+				Assert.assertNotNull(request.getFirstHeader("Cookie"));
+				Assert.assertEquals("JSESSIONID=926E1C6A52804A625DFB0139962D4E13", request.getFirstHeader("Cookie")
+						.getValue());
+				return new BasicHttpResponse(new ProtocolVersion("HTTP", 1, 1), HttpStatus.SC_OK, "OK");
+			}
+		});
+		Driver driver = createMockDriver(properties, mockHttpClient);
 
-        request = TestUtils.createRequest("http://127.0.0.1:8081/foobar.jsp");
-        BasicClientCookie cookie = new BasicClientCookie("_JSESSIONID", "926E1C6A52804A625DFB0139962D4E13");
-        TestUtils.addCookie(cookie, request);
+		request = TestUtils.createRequest("http://127.0.0.1:8081/foobar.jsp");
+		BasicClientCookie cookie = new BasicClientCookie("_JSESSIONID", "926E1C6A52804A625DFB0139962D4E13");
+		TestUtils.addCookie(cookie, request);
 
-        driver.proxy("/foobar.jsp", request);
-    }
-	
+		driver.proxy("/foobar.jsp", request);
+	}
+
 	public void testRewriteCookiePath() throws Exception {
-        Properties properties = new Properties();
-        properties.put(Parameters.REMOTE_URL_BASE.name, "http://localhost:8080/"); 
-        properties.put(Parameters.PRESERVE_HOST.name, "true");
-        properties.put(Parameters.FORWARD_COOKIES.name, "*");
+		Properties properties = new Properties();
+		properties.put(Parameters.REMOTE_URL_BASE.name, "http://localhost:8080/");
+		properties.put(Parameters.PRESERVE_HOST.name, "true");
+		properties.put(Parameters.FORWARD_COOKIES.name, "*");
 
-        MockHttpClient mockHttpClient = new MockHttpClient();
-        mockHttpClient.setHttpResponseExecutor(new HttpRequestExecutor() {
-            @Override
-            public HttpResponse execute(HttpRequest request, HttpClientConnection conn, HttpContext context)
-                    throws IOException, HttpException {
-                
-                BasicHttpResponse response = new BasicHttpResponse(new ProtocolVersion("HTTP", 1, 1), HttpStatus.SC_OK, "OK");
-                        
-                          response.addHeader(new BasicHeader("Set-Cookie",
-                                    "name1=value1;Path=/foo"));
-                return response;
-            }
-        });
-        Driver driver = createMockDriver(properties, mockHttpClient);
+		MockHttpClient mockHttpClient = new MockHttpClient();
+		mockHttpClient.setHttpResponseExecutor(new HttpRequestExecutor() {
+			@Override
+			public HttpResponse execute(HttpRequest request, HttpClientConnection conn, HttpContext context)
+					throws IOException, HttpException {
 
-        request = TestUtils.createRequest("http://localhost:8081/foo/foobar.jsp");
+				BasicHttpResponse response = new BasicHttpResponse(new ProtocolVersion("HTTP", 1, 1), HttpStatus.SC_OK,
+						"OK");
 
-        driver.proxy("/foo/foobar.jsp", request);
-        
-        ContainerRequestMediator mediator = HttpRequestHelper.getMediator(request);
-        Assert.assertEquals(1, mediator.getCookies().length );
-        Assert.assertEquals( "/foo", mediator.getCookies()[0].getPath() );
-    }
-	
+				response.addHeader(new BasicHeader("Set-Cookie", "name1=value1;Path=/foo"));
+				return response;
+			}
+		});
+		Driver driver = createMockDriver(properties, mockHttpClient);
+
+		request = TestUtils.createRequest("http://localhost:8081/foo/foobar.jsp");
+
+		driver.proxy("/foo/foobar.jsp", request);
+
+		ContainerRequestMediator mediator = HttpRequestHelper.getMediator(request);
+		Assert.assertEquals(1, mediator.getCookies().length);
+		Assert.assertEquals("/foo", mediator.getCookies()[0].getPath());
+	}
+
 	public void testRewriteCookiePathNotMatching() throws Exception {
-        Properties properties = new Properties();
-        properties.put(Parameters.REMOTE_URL_BASE.name, "http://localhost:8080/"); 
-        properties.put(Parameters.PRESERVE_HOST.name, "true");
-        properties.put(Parameters.FORWARD_COOKIES.name, "*");
+		Properties properties = new Properties();
+		properties.put(Parameters.REMOTE_URL_BASE.name, "http://localhost:8080/");
+		properties.put(Parameters.PRESERVE_HOST.name, "true");
+		properties.put(Parameters.FORWARD_COOKIES.name, "*");
 
-        MockHttpClient mockHttpClient = new MockHttpClient();
-        mockHttpClient.setHttpResponseExecutor(new HttpRequestExecutor() {
-            @Override
-            public HttpResponse execute(HttpRequest request, HttpClientConnection conn, HttpContext context)
-                    throws IOException, HttpException {
-                
-                BasicHttpResponse response = new BasicHttpResponse(new ProtocolVersion("HTTP", 1, 1), HttpStatus.SC_OK, "OK");
-                        
-                          response.addHeader(new BasicHeader("Set-Cookie",
-                                    "name1=value1;Path=/bar"));
-                return response;
-            }
-        });
-        Driver driver = createMockDriver(properties, mockHttpClient);
+		MockHttpClient mockHttpClient = new MockHttpClient();
+		mockHttpClient.setHttpResponseExecutor(new HttpRequestExecutor() {
+			@Override
+			public HttpResponse execute(HttpRequest request, HttpClientConnection conn, HttpContext context)
+					throws IOException, HttpException {
 
-        request = TestUtils.createRequest("http://localhost:8081/foo/foobar.jsp");
+				BasicHttpResponse response = new BasicHttpResponse(new ProtocolVersion("HTTP", 1, 1), HttpStatus.SC_OK,
+						"OK");
 
-        driver.proxy("/bar/foobar.jsp", request);
-        
-        ContainerRequestMediator mediator = HttpRequestHelper.getMediator(request);
-        Assert.assertEquals(1, mediator.getCookies().length );
-        Assert.assertEquals( "/", mediator.getCookies()[0].getPath() );
-    }
-	
+				response.addHeader(new BasicHeader("Set-Cookie", "name1=value1;Path=/bar"));
+				return response;
+			}
+		});
+		Driver driver = createMockDriver(properties, mockHttpClient);
+
+		request = TestUtils.createRequest("http://localhost:8081/foo/foobar.jsp");
+
+		driver.proxy("/bar/foobar.jsp", request);
+
+		ContainerRequestMediator mediator = HttpRequestHelper.getMediator(request);
+		Assert.assertEquals(1, mediator.getCookies().length);
+		Assert.assertEquals("/", mediator.getCookies()[0].getPath());
+	}
+
 	/**
 	 * 0000174: Redirect location with default port specified are incorrectly
 	 * rewritten when preserveHost=true
@@ -774,9 +797,9 @@ public class DriverTest extends TestCase {
 		// The backend server sets the port even if default (OK it should not
 		// but some servers do it)
 		response.addHeader("Location", "http://www.foo.com:80/foo/bar");
-		   MockHttpClient mockHttpClient = new MockHttpClient();
-	        
-		   mockHttpClient.setResponse(response);
+		MockHttpClient mockHttpClient = new MockHttpClient();
+
+		mockHttpClient.setResponse(response);
 		Driver driver = createMockDriver(properties, mockHttpClient);
 		// HttpServletMediator will put the default port in the original request
 		// URI even if
@@ -789,7 +812,8 @@ public class DriverTest extends TestCase {
 		driver.proxy("/foo", request);
 		// The test initially failed with an invalid Location:
 		// http://www.foo.com:80:80/foo/bar
-		assertEquals("http://www.foo.com:80/foo/bar", TestUtils.getResponse(request).getFirstHeader("Location").getValue());
+		assertEquals("http://www.foo.com:80/foo/bar", TestUtils.getResponse(request).getFirstHeader("Location")
+				.getValue());
 	}
 
 	/**
@@ -802,12 +826,13 @@ public class DriverTest extends TestCase {
 		properties.put(Parameters.REMOTE_URL_BASE, "http://127.0.0.1");
 		properties.put(Parameters.PRESERVE_HOST, "true");
 
-		   MockHttpClient mockHttpClient = new MockHttpClient();
-	        
-		   mockHttpClient.setHttpResponseExecutor(new HttpRequestExecutor() {
-	            @Override
-	            public HttpResponse execute(HttpRequest request, HttpClientConnection conn, HttpContext context)
-	                    throws IOException, HttpException {if (!request.getLastHeader("Host").getValue().equals("www.foo.com"))
+		MockHttpClient mockHttpClient = new MockHttpClient();
+
+		mockHttpClient.setHttpResponseExecutor(new HttpRequestExecutor() {
+			@Override
+			public HttpResponse execute(HttpRequest request, HttpClientConnection conn, HttpContext context)
+					throws IOException, HttpException {
+				if (!request.getLastHeader("Host").getValue().equals("www.foo.com"))
 					throw new IllegalArgumentException("Host must be www.foo.com");
 				return new HttpResponseBuilder().status(HttpStatus.SC_MOVED_TEMPORARILY).entity("Found")
 						.header("Location", "http://www.foo.com").build();
@@ -815,10 +840,65 @@ public class DriverTest extends TestCase {
 		});
 		Driver driver = createMockDriver(properties, mockHttpClient);
 
-		HttpEntityEnclosingRequest request1 = new HttpRequestBuilder().mockMediator().uri("http://www.foo.com:80").build();
+		HttpEntityEnclosingRequest request1 = new HttpRequestBuilder().mockMediator().uri("http://www.foo.com:80")
+				.build();
 		assertEquals("www.foo.com", request1.getLastHeader("Host").getValue());
-		
+
 		driver.proxy("", request1);
 		assertEquals("http://www.foo.com", TestUtils.getResponse(request1).getFirstHeader("Location").getValue());
 	}
+
+	/**
+	 * 0000231: ESIgate should be enable to mashup elements for an error/404
+	 * page
+	 * 
+	 * @see "http://sourceforge.net/apps/mantisbt/webassembletool/view.php?id=231"
+	 * 
+	 * @throws Exception
+	 */
+	public void testBug231_RenderingOnProxyError() throws Exception {
+		// Configuration
+		Properties properties = new Properties();
+		properties.put(Parameters.REMOTE_URL_BASE.name, "http://localhost.mydomain.fr/");
+		properties.put(Parameters.PRESERVE_HOST.name, "false");
+
+		// Setup server responses.
+		MockHttpClient mockHttpClient = new MockHttpClient();
+		mockHttpClient.setHttpResponseExecutor(new HttpRequestExecutor() {
+			@Override
+			public HttpResponse execute(HttpRequest request, HttpClientConnection conn, HttpContext context)
+					throws IOException, HttpException {
+
+				// The main page
+				if (request.getRequestLine().getUri().equals("/foobar/"))
+					return new HttpResponseBuilder()
+							.entity(new StringEntity("<esi:include src=\"http://test.mydomain.fr/esi/\"/>",
+									ContentType.TEXT_HTML)).status(400).build();
+
+				// The ESI fragment
+				if (request.getRequestLine().getUri().equals("/esi/"))
+					return new HttpResponseBuilder().entity("OK").build();
+
+				// Other unexpected request ? -> Fail
+				Assert.fail("Unexpected request" + request.getRequestLine().getUri());
+				return null;
+			}
+		});
+
+		// Build driver and request.
+		Driver driver = createMockDriver(properties, mockHttpClient);
+		request = new HttpRequestBuilder().uri("http://test.mydomain.fr/foobar/").mockMediator().build();
+
+		try {
+			// Perform call with ESI rendering.
+			driver.proxy("/foobar/", request, new EsiRenderer());
+			fail("HttpErrorPage expected");
+		} catch (HttpErrorPage errorPage) {
+			// Ensure request was esi-processed.
+			HttpResponse response = errorPage.getHttpResponse();
+			Assert.assertEquals("OK", EntityUtils.toString(response.getEntity()));
+		}
+
+	}
+
 }
