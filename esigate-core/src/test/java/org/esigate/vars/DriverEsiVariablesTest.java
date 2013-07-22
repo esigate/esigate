@@ -1,6 +1,7 @@
 package org.esigate.vars;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Properties;
 
 import junit.framework.Assert;
@@ -35,28 +36,45 @@ public class DriverEsiVariablesTest extends AbstractDriverTestCase {
 	 * 
 	 * @throws IOException
 	 * @throws HttpErrorPage
+	 * @throws URISyntaxException
 	 */
 	@Test
-	public void testEsiVariables() throws IOException, HttpErrorPage {
+	public void testEsiVariables() throws IOException, HttpErrorPage, URISyntaxException {
 		// Configuration
 		Properties properties = new Properties();
 		properties.put(Parameters.REMOTE_URL_BASE.name, "http://localhost.mydomain.fr/");
 
 		// Test case
+		HttpEntityEnclosingRequest request = createHttpRequest()
+				.uri("http://test.mydomain.fr/foobar/?test=esigate&test2=esigate2")
+				.header("Referer", "http://www.esigate.org")
+				.header("User-Agent",
+						"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/536.30.1 (KHTML, like Gecko) Version/6.0.5 Safari/536.30.1")
+				.header("Accept-Language", "da, en-gb;q=0.8, en;q=0.7").cookie("test-cookie", "test-cookie-value")
+				.cookie("test-cookie2", "test-cookie-value2").mockMediator().build();
+
 		final StringBuilder expected = new StringBuilder();
 		addExpression(expected, "HTTP_ACCEPT_LANGUAGE", "da, en-gb;q=0.8, en;q=0.7");
 		addExpression(expected, "HTTP_ACCEPT_LANGUAGE{en}", "true");
 		addExpression(expected, "HTTP_ACCEPT_LANGUAGE{fr}", "false");
-//		addExpression(expected, "HTTP_ACCEPT_LANGUAGE{fr} & HTTP_ACCEPT_LANGUAGE{en}", "false");
-//		addExpression(expected, "HTTP_ACCEPT_LANGUAGE{fr} | HTTP_ACCEPT_LANGUAGE{en}", "true");
-//		addExpression(expected, "!HTTP_ACCEPT_LANGUAGE{fr}", "true");
 		addExpression(expected, "QUERY_STRING{test}", "esigate");
-//		addExpression(expected, "QUERY_STRING{test}==esigate", "true");
 		addExpression(expected, "QUERY_STRING", "test=esigate&test2=esigate2");
-//		addExpression(expected, "QUERY_STRING{missing}|default-value", "default-value");
-//		addExpression(expected, "QUERY_STRING{missing}", "");
 		addExpression(expected, "HTTP_REFERER", "http://www.esigate.org");
 		addExpression(expected, "PROVIDER{tested}", "http://localhost.mydomain.fr/");
+		addExpression(expected, "PROVIDER{missing}", "");
+		addExpression(expected, "PROVIDER", "");
+		addExpression(expected, "HTTP_HOST", "test.mydomain.fr");
+		addExpression(expected, "HTTP_USER_AGENT",
+				"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/536.30.1 (KHTML, like Gecko) Version/6.0.5 Safari/536.30.1");
+		addExpression(expected, "HTTP_COOKIE{test-cookie}", "test-cookie-value");
+		// addExpression(expected, "HTTP_COOKIE",
+		// "test-cookie=test-cookie-value; test-cookie2=test-cookie-value2");
+		// addExpression(expected, "HTTP_COOKIE{missing}", "");
+		// addExpression(expected, "QUERY_STRING{missing}|default-value",
+		// "default-value");
+		// addExpression(expected, "QUERY_STRING{missing}|'default value'",
+		// "default value");
+		// addExpression(expected, "QUERY_STRING{missing}", "");
 
 		// Setup remote server (provider) response.
 		HttpRequestExecutor mockExecutor = new HttpRequestExecutor() {
@@ -81,12 +99,8 @@ public class DriverEsiVariablesTest extends AbstractDriverTestCase {
 
 		// Build driver and request.
 		Driver driver = createMockDriver(properties, mockExecutor);
-		HttpEntityEnclosingRequest request = createHttpRequest()
-				.uri("http://test.mydomain.fr/foobar/?test=esigate&test2=esigate2")
-				.header("Referer", "http://www.esigate.org").header("Accept-Language", "da, en-gb;q=0.8, en;q=0.7")
-				.mockMediator().build();
 
-		driver.proxy("/foobar/", request, new EsiRenderer());
+		driverProxy(driver, request, new EsiRenderer());
 
 		HttpResponse response = TestUtils.getResponse(request);
 

@@ -210,12 +210,13 @@ public class VariablesResolver {
 			}
 		} else if (var.indexOf("PROVIDER") != -1) {
 			String providerUrl = StringUtils.EMPTY;
-			if (arg != null) {
+			try {
 				Driver driver = DriverFactory.getInstance(arg);
-				if (driver != null) {
-					providerUrl = driver.getConfiguration().getBaseUrlRetrieveStrategy().getBaseURL(request);
-				}
+				providerUrl = driver.getConfiguration().getBaseUrlRetrieveStrategy().getBaseURL(request);
+			} catch (Exception e) {
+				// No driver available for this id.
 			}
+
 			return providerUrl;
 
 		}
