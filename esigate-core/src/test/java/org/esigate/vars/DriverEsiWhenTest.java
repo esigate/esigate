@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 public class DriverEsiWhenTest extends AbstractDriverTestCase {
 	private static final Logger LOG = LoggerFactory.getLogger(DriverEsiWhenTest.class);
 
+	@SuppressWarnings("static-method")
 	@Test
 	public void testEsiWhenCase1() throws IOException, HttpErrorPage, URISyntaxException {
 		// Configuration
@@ -58,7 +59,7 @@ public class DriverEsiWhenTest extends AbstractDriverTestCase {
 		// Setup remote server (provider) response.
 		HttpRequestExecutor mockExecutor = new HttpRequestExecutor() {
 			@Override
-			public HttpResponse execute(HttpRequest request, HttpClientConnection conn, HttpContext context)
+			public HttpResponse execute(HttpRequest requestParam, HttpClientConnection conn, HttpContext context)
 					throws IOException, HttpException {
 
 				StringBuilder content = new StringBuilder();
@@ -100,7 +101,9 @@ public class DriverEsiWhenTest extends AbstractDriverTestCase {
 
 	static void addExpression(StringBuilder sb, String expr, boolean value) {
 		sb.append("<p>" + expr + ": " + value + "</p>");
-		LOG.info("Adding {} with expected result {}", expr, value);
+		if (LOG.isInfoEnabled()) {
+			LOG.info("Adding {} with expected result {}", expr, String.valueOf(value));
+		}
 
 	}
 

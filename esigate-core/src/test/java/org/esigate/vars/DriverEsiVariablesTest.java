@@ -38,6 +38,7 @@ public class DriverEsiVariablesTest extends AbstractDriverTestCase {
 	 * @throws HttpErrorPage
 	 * @throws URISyntaxException
 	 */
+	@SuppressWarnings("static-method")
 	@Test
 	public void testEsiVariablesCase1() throws IOException, HttpErrorPage, URISyntaxException {
 		// Configuration
@@ -85,7 +86,7 @@ public class DriverEsiVariablesTest extends AbstractDriverTestCase {
 		// Setup remote server (provider) response.
 		HttpRequestExecutor mockExecutor = new HttpRequestExecutor() {
 			@Override
-			public HttpResponse execute(HttpRequest request, HttpClientConnection conn, HttpContext context)
+			public HttpResponse execute(HttpRequest requestParam, HttpClientConnection conn, HttpContext context)
 					throws IOException, HttpException {
 
 				StringBuilder content = new StringBuilder();
@@ -129,6 +130,7 @@ public class DriverEsiVariablesTest extends AbstractDriverTestCase {
 	 * @throws HttpErrorPage
 	 * @throws URISyntaxException
 	 */
+	@SuppressWarnings("static-method")
 	@Test
 	public void testEsiVariablesCase2() throws IOException, HttpErrorPage, URISyntaxException {
 		// Configuration
@@ -163,7 +165,7 @@ public class DriverEsiVariablesTest extends AbstractDriverTestCase {
 		// Setup remote server (provider) response.
 		HttpRequestExecutor mockExecutor = new HttpRequestExecutor() {
 			@Override
-			public HttpResponse execute(HttpRequest request, HttpClientConnection conn, HttpContext context)
+			public HttpResponse execute(HttpRequest requestParam, HttpClientConnection conn, HttpContext context)
 					throws IOException, HttpException {
 
 				StringBuilder content = new StringBuilder();
