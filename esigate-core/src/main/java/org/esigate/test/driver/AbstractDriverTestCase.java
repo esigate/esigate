@@ -121,10 +121,10 @@ public abstract class AbstractDriverTestCase extends TestCase {
 	 * @throws URISyntaxException
 	 */
 	public static HttpResponse driverProxy(Driver d,
-			HttpEntityEnclosingRequest request) throws IOException,
+			HttpEntityEnclosingRequest request, Renderer... renderers) throws IOException,
 			HttpErrorPage, URISyntaxException {
 		String uri = request.getRequestLine().getUri();
-		d.proxy(new URI(uri).getPath(), request);
+		d.proxy(new URI(uri).getPath(), request,renderers);
 
 		return TestUtils.getResponse(request);
 
