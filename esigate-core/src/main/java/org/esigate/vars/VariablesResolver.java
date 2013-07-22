@@ -209,11 +209,14 @@ public class VariablesResolver {
 				}
 			}
 		} else if (var.indexOf("PROVIDER") != -1) {
+			String providerUrl = StringUtils.EMPTY;
 			if (arg != null) {
 				Driver driver = DriverFactory.getInstance(arg);
-				return driver.getConfiguration().getBaseUrlRetrieveStrategy().getBaseURL(request);
+				if (driver != null) {
+					providerUrl = driver.getConfiguration().getBaseUrlRetrieveStrategy().getBaseURL(request);
+				}
 			}
-			return StringUtils.EMPTY;
+			return providerUrl;
 
 		}
 		return res;
