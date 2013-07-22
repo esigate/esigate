@@ -208,7 +208,7 @@ public class VariablesResolver {
 					}
 				}
 			}
-		} else if (var.indexOf("PROVIDER") != 1) {
+		} else if (var.indexOf("PROVIDER") != -1) {
 			if (arg != null) {
 				Driver driver = DriverFactory.getInstance(arg);
 				return driver.getConfiguration().getBaseUrlRetrieveStrategy().getBaseURL(request);
