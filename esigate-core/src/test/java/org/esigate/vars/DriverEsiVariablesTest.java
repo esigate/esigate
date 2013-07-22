@@ -54,21 +54,21 @@ public class DriverEsiVariablesTest extends AbstractDriverTestCase {
 				.cookie("test-cookie2", "test-cookie-value2").mockMediator().build();
 
 		final StringBuilder expected = new StringBuilder();
-		addExpression(expected, "HTTP_ACCEPT_LANGUAGE", "da, en-gb;q=0.8, en;q=0.7");
-		addExpression(expected, "HTTP_ACCEPT_LANGUAGE{en}", "true");
-		addExpression(expected, "HTTP_ACCEPT_LANGUAGE{fr}", "false");
-		addExpression(expected, "QUERY_STRING{test}", "esigate");
-		addExpression(expected, "QUERY_STRING", "test=esigate&test2=esigate2");
-		addExpression(expected, "HTTP_REFERER", "http://www.esigate.org");
-		addExpression(expected, "PROVIDER{tested}", "http://localhost.mydomain.fr/");
-		addExpression(expected, "PROVIDER{missing}", "");
-		addExpression(expected, "PROVIDER", "");
-		addExpression(expected, "HTTP_HOST", "test.mydomain.fr");
-		addExpression(expected, "HTTP_USER_AGENT",
+		addVariable(expected, "HTTP_ACCEPT_LANGUAGE", "da, en-gb;q=0.8, en;q=0.7");
+		addVariable(expected, "HTTP_ACCEPT_LANGUAGE{en}", "true");
+		addVariable(expected, "HTTP_ACCEPT_LANGUAGE{fr}", "false");
+		addVariable(expected, "QUERY_STRING{test}", "esigate");
+		addVariable(expected, "QUERY_STRING", "test=esigate&test2=esigate2");
+		addVariable(expected, "HTTP_REFERER", "http://www.esigate.org");
+		addVariable(expected, "PROVIDER{tested}", "http://localhost.mydomain.fr/");
+		addVariable(expected, "PROVIDER{missing}", "");
+		addVariable(expected, "PROVIDER", "");
+		addVariable(expected, "HTTP_HOST", "test.mydomain.fr");
+		addVariable(expected, "HTTP_USER_AGENT",
 				"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/536.30.1 (KHTML, like Gecko) Version/6.0.5 Safari/536.30.1");
-		addExpression(expected, "HTTP_USER_AGENT{browser}", "MOZILLA");
-		addExpression(expected, "HTTP_USER_AGENT{os}", "MAC");
-		addExpression(expected, "HTTP_COOKIE{test-cookie}", "test-cookie-value");
+		addVariable(expected, "HTTP_USER_AGENT{browser}", "MOZILLA");
+		addVariable(expected, "HTTP_USER_AGENT{os}", "MAC");
+		addVariable(expected, "HTTP_COOKIE{test-cookie}", "test-cookie-value");
 
 		// TODO: The following are failing tests
 		// addExpression(expected, "HTTP_USER_AGENT{version}",
@@ -94,7 +94,7 @@ public class DriverEsiVariablesTest extends AbstractDriverTestCase {
 				String[] expectedArray = StringUtils.splitByWholeSeparator(expected.toString(), "<p>");
 
 				for (String expr : expectedArray) {
-					addExpression(content, expr.substring(0, expr.indexOf(":")));
+					addVariable(content, expr.substring(0, expr.indexOf(":")));
 				}
 
 				content.append("</esi:vars>");
@@ -141,12 +141,12 @@ public class DriverEsiVariablesTest extends AbstractDriverTestCase {
 				.build();
 
 		final StringBuilder expected = new StringBuilder();
-		addExpression(expected, "HTTP_ACCEPT_LANGUAGE{en}", "false");
-		addExpression(expected, "HTTP_ACCEPT_LANGUAGE{fr}", "false");
-		addExpression(expected, "HTTP_HOST", "test.mydomain.fr");
-		addExpression(expected, "HTTP_USER_AGENT", "Mozilla/5.0 (Windows; U; MSIE 9.0; WIndows NT 9.0; en-US)");
-		addExpression(expected, "HTTP_USER_AGENT{browser}", "MSIE");
-		addExpression(expected, "HTTP_USER_AGENT{os}", "WIN");
+		addVariable(expected, "HTTP_ACCEPT_LANGUAGE{en}", "false");
+		addVariable(expected, "HTTP_ACCEPT_LANGUAGE{fr}", "false");
+		addVariable(expected, "HTTP_HOST", "test.mydomain.fr");
+		addVariable(expected, "HTTP_USER_AGENT", "Mozilla/5.0 (Windows; U; MSIE 9.0; WIndows NT 9.0; en-US)");
+		addVariable(expected, "HTTP_USER_AGENT{browser}", "MSIE");
+		addVariable(expected, "HTTP_USER_AGENT{os}", "WIN");
 
 		// TODO: The following are failing tests
 		// addExpression(expected, "HTTP_ACCEPT_LANGUAGE", "");
@@ -172,7 +172,7 @@ public class DriverEsiVariablesTest extends AbstractDriverTestCase {
 				String[] expectedArray = StringUtils.splitByWholeSeparator(expected.toString(), "<p>");
 
 				for (String expr : expectedArray) {
-					addExpression(content, expr.substring(0, expr.indexOf(":")));
+					addVariable(content, expr.substring(0, expr.indexOf(": ")));
 				}
 
 				content.append("</esi:vars>");
@@ -199,12 +199,12 @@ public class DriverEsiVariablesTest extends AbstractDriverTestCase {
 
 	}
 
-	static void addExpression(StringBuilder sb, String variable) {
+	static void addVariable(StringBuilder sb, String variable) {
 		sb.append("<p>" + variable + ": $(" + variable + ")</p>");
 		LOG.info("Adding {} for evaluation", variable);
 	}
 
-	static void addExpression(StringBuilder sb, String variable, String value) {
+	static void addVariable(StringBuilder sb, String variable, String value) {
 		sb.append("<p>" + variable + ": " + value + "</p>");
 		LOG.info("Adding {} with expected result {}", variable, value);
 

@@ -7,80 +7,89 @@ public class Operations {
 	private static boolean executeOperation(String op) {
 
 		int i;
-		double dop1, dop2;
+		Double dop1, dop2;
 		String op1, op2;
 
 		try {
 			if (op.indexOf("==") != -1) {
 				i = op.indexOf("==");
-				op1 = op.substring(0, i);
-				op2 = op.substring(i + 2);
-				if (op.indexOf("'") != -1) {
-					return op1.equals(op2);
-				} else {
-					dop1 = Double.parseDouble(op1);
-					dop2 = Double.parseDouble(op2);
-					return dop1 == dop2;
+				op1 = removeSimpleQuotes( op.substring(0, i));
+				op2 = removeSimpleQuotes(op.substring(i + 2));
+
+				dop1 = getOperandAsNumeric(op1);
+				dop2 = getOperandAsNumeric(op2);
+				if (dop1 != null && dop2 != null) {
+					return dop1.equals(dop2);
 				}
+
+				return op1.equals(op2);
+
 			} else if (op.indexOf("!=") != -1) {
 				i = op.indexOf("!=");
-				op1 = op.substring(0, i);
-				op2 = op.substring(i + 2);
-				if (op.indexOf("'") != -1) {
-					return !op1.equals(op2);
-				} else {
-					dop1 = Double.parseDouble(op1);
-					dop2 = Double.parseDouble(op2);
-					return dop1 != dop2;
+				op1 = removeSimpleQuotes(op.substring(0, i));
+				op2 = removeSimpleQuotes(op.substring(i + 2));
+
+				dop1 = getOperandAsNumeric(op1);
+				dop2 = getOperandAsNumeric(op2);
+				if (dop1 != null && dop2 != null) {
+					return !dop1.equals(dop2);
 				}
+
+				return !op1.equals(op2);
+
 			} else if (op.indexOf(">=") != -1) {
 				i = op.indexOf(">=");
-				op1 = op.substring(0, i);
-				op2 = op.substring(i + 2);
-				if (op.indexOf("'") != -1) {
-					int cmp = op1.compareTo(op2);
-					return cmp >= 0;
-				} else {
-					dop1 = Double.parseDouble(op1);
-					dop2 = Double.parseDouble(op2);
-					return dop1 >= dop2;
+				op1 = removeSimpleQuotes(op.substring(0, i));
+				op2 = removeSimpleQuotes(op.substring(i + 2));
+
+				dop1 = getOperandAsNumeric(op1);
+				dop2 = getOperandAsNumeric(op2);
+				if (dop1 != null && dop2 != null) {
+					return dop1.doubleValue() >= dop2.doubleValue();
 				}
+				int cmp = op1.compareTo(op2);
+				return cmp >= 0;
+
 			} else if (op.indexOf("<=") != -1) {
 				i = op.indexOf("<=");
-				op1 = op.substring(0, i);
-				op2 = op.substring(i + 2);
-				if (op.indexOf("'") != -1) {
-					int cmp = op1.compareTo(op2);
-					return cmp <= 0;
-				} else {
-					dop1 = Double.parseDouble(op1);
-					dop2 = Double.parseDouble(op2);
-					return dop1 <= dop2;
+				op1 = removeSimpleQuotes(op.substring(0, i));
+				op2 = removeSimpleQuotes(op.substring(i + 2));
+
+				dop1 = getOperandAsNumeric(op1);
+				dop2 = getOperandAsNumeric(op2);
+				if (dop1 != null && dop2 != null) {
+					return dop1.doubleValue() <= dop2.doubleValue();
 				}
+
+				int cmp = op1.compareTo(op2);
+				return cmp <= 0;
+
 			} else if (op.indexOf(">") != -1) {
 				i = op.indexOf(">");
-				op1 = op.substring(0, i);
-				op2 = op.substring(i + 1);
-				if (op.indexOf("'") != -1) {
-					int cmp = op1.compareTo(op2);
-					return cmp > 0;
-				} else {
-					dop1 = Double.parseDouble(op1);
-					dop2 = Double.parseDouble(op2);
-					return dop1 > dop2;
+				op1 = removeSimpleQuotes(op.substring(0, i));
+				op2 = removeSimpleQuotes(op.substring(i + 1));
+
+				dop1 = getOperandAsNumeric(op1);
+				dop2 = getOperandAsNumeric(op2);
+				if (dop1 != null && dop2 != null) {
+					return dop1.doubleValue() > dop2.doubleValue();
 				}
+
+				int cmp = op1.compareTo(op2);
+				return cmp > 0;
 			} else if (op.indexOf("<") != -1) {
 				i = op.indexOf("<");
-				op1 = op.substring(0, i);
-				op2 = op.substring(i + 1);
-				if (op.indexOf("'") != -1) {
-					int cmp = op1.compareTo(op2);
-					return cmp < 0;
-				} else {
-					dop1 = Double.parseDouble(op1);
-					dop2 = Double.parseDouble(op2);
-					return dop1 < dop2;
+				op1 = removeSimpleQuotes(op.substring(0, i));
+				op2 = removeSimpleQuotes(op.substring(i + 1));
+
+				dop1 = getOperandAsNumeric(op1);
+				dop2 = getOperandAsNumeric(op2);
+				if (dop1 != null && dop2 != null) {
+					return dop1.doubleValue() < dop2.doubleValue();
 				}
+
+				int cmp = op1.compareTo(op2);
+				return cmp < 0;
 			}
 		} catch (Exception e) {
 			return false;
@@ -89,8 +98,7 @@ public class Operations {
 		return false;
 	}
 
-	private static boolean executeOperations(ArrayList<String> operands,
-			ArrayList<String> operations) {
+	private static boolean executeOperations(ArrayList<String> operands, ArrayList<String> operations) {
 		boolean res = false;
 		ArrayList<Boolean> results = new ArrayList<Boolean>();
 
@@ -126,6 +134,31 @@ public class Operations {
 		return res;
 	}
 
+	/**
+	 * Get an operand as a numeric type.
+	 * 
+	 * @param op
+	 *            operand as String
+	 * @return Double value or null if op is not numeric
+	 */
+	private static Double getOperandAsNumeric(String op) {
+		Double d = null;
+		try {
+			d = Double.valueOf(op);
+		} catch (Exception e) {
+			// Null is returned if not numeric.
+		}
+		return d;
+	}
+
+	private static String removeSimpleQuotes(String s) {
+		if (s.startsWith("'") && s.endsWith("'")) {
+			return s.substring(1, s.length() - 1);
+		}
+		return s;
+
+	}
+
 	public static boolean processOperators(String test) {
 
 		if (test == null || test.equals("")) {
@@ -149,9 +182,7 @@ public class Operations {
 				int sbIndex = s.indexOf(')');
 				operands.add(s.substring(s.indexOf('(') + 1, sbIndex));
 				if (s.length() > sbIndex + 1) {
-					String oper = s.substring(sbIndex + 1, s.substring(sbIndex)
-							.indexOf('(')
-							+ sbIndex);
+					String oper = s.substring(sbIndex + 1, s.substring(sbIndex).indexOf('(') + sbIndex);
 					operations.add(oper);
 					s = s.substring(sbIndex + 2);
 				} else {
