@@ -66,7 +66,13 @@ public class DriverEsiVariablesTest extends AbstractDriverTestCase {
 		addExpression(expected, "HTTP_HOST", "test.mydomain.fr");
 		addExpression(expected, "HTTP_USER_AGENT",
 				"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/536.30.1 (KHTML, like Gecko) Version/6.0.5 Safari/536.30.1");
+		addExpression(expected, "HTTP_USER_AGENT{browser}",
+				"MOZILLA");
+		addExpression(expected, "HTTP_USER_AGENT{os}",
+				"MAC");
 		addExpression(expected, "HTTP_COOKIE{test-cookie}", "test-cookie-value");
+//		addExpression(expected, "HTTP_USER_AGENT{version}",
+//				"4.0");
 		// addExpression(expected, "HTTP_COOKIE",
 		// "test-cookie=test-cookie-value; test-cookie2=test-cookie-value2");
 		// addExpression(expected, "HTTP_COOKIE{missing}", "");
