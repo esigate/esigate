@@ -21,10 +21,12 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpRequest;
 import org.apache.http.cookie.Cookie;
 import org.esigate.ConfigurationException;
 import org.esigate.Driver;
+import org.esigate.DriverFactory;
 import org.esigate.util.HttpRequestHelper;
 import org.esigate.util.UriUtils;
 import org.slf4j.Logger;
@@ -146,7 +148,7 @@ public class VariablesResolver {
 		if (properties != null) {
 			result = properties.getProperty(var, result);
 		}
-		LOG.debug("Resolve property $(" + var + ")=" + result);
+		LOG.debug("Resolve property $({})={}", var, result);
 		return result;
 	}
 
@@ -206,6 +208,13 @@ public class VariablesResolver {
 					}
 				}
 			}
+		} else if (var.indexOf("PROVIDER") != 1) {
+			if (arg != null) {
+				Driver driver = DriverFactory.getInstance(arg);
+				return driver.getConfiguration().getBaseUrlRetrieveStrategy().getBaseURL(request);
+			}
+			return StringUtils.EMPTY;
+
 		}
 		return res;
 	}
