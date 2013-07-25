@@ -18,6 +18,7 @@ import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpRequestExecutor;
 import org.apache.http.util.EntityUtils;
 import org.esigate.Driver;
+import org.esigate.DriverFactory;
 import org.esigate.HttpErrorPage;
 import org.esigate.Parameters;
 import org.esigate.esi.EsiRenderer;
@@ -27,6 +28,16 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This test case ensure ESI variables are correctly replaced.
+ * 
+ * <p>
+ * The backend reply a Http Response with &lt:esi:vars&gt; and the result
+ * returned by esigate is compared with the expected result.
+ * 
+ * @author Nicolas Richeton
+ * 
+ */
 public class DriverEsiVariablesTest extends AbstractDriverTestCase {
 	private static final Logger LOG = LoggerFactory.getLogger(DriverEsiVariablesTest.class);
 
@@ -41,6 +52,11 @@ public class DriverEsiVariablesTest extends AbstractDriverTestCase {
 	@SuppressWarnings("static-method")
 	@Test
 	public void testEsiVariablesCase1() throws IOException, HttpErrorPage, URISyntaxException {
+		// Reset Driverfactory (used for default driver with $(PROVIDER))
+		Properties factoryProperties = new Properties();
+		factoryProperties.put("tested." + Parameters.REMOTE_URL_BASE.name, "http://localhost.mydomain.fr/");
+		DriverFactory.configure(factoryProperties);
+
 		// Configuration
 		Properties properties = new Properties();
 		properties.put(Parameters.REMOTE_URL_BASE.name, "http://localhost.mydomain.fr/");
@@ -100,6 +116,8 @@ public class DriverEsiVariablesTest extends AbstractDriverTestCase {
 
 				content.append("</esi:vars>");
 
+				LOG.info("Backend response:\n" + content.toString());
+
 				return createHttpResponse().entity(new StringEntity(content.toString(), ContentType.TEXT_HTML)).build();
 			}
 		};
@@ -110,9 +128,11 @@ public class DriverEsiVariablesTest extends AbstractDriverTestCase {
 		driverProxy(driver, request, new EsiRenderer());
 
 		HttpResponse response = TestUtils.getResponse(request);
+		String entityContent = EntityUtils.toString(response.getEntity());
+		LOG.info("Esigate response: \n" + entityContent);
 
 		String[] expectedArray = StringUtils.splitByWholeSeparator(expected.toString(), "<p>");
-		String[] resultArray = StringUtils.splitByWholeSeparator(EntityUtils.toString(response.getEntity()), "<p>");
+		String[] resultArray = StringUtils.splitByWholeSeparator(entityContent, "<p>");
 
 		for (int i = 0; i < expectedArray.length; i++) {
 			String varName = expectedArray[i].substring(0, expectedArray[i].indexOf(":"));
@@ -178,6 +198,7 @@ public class DriverEsiVariablesTest extends AbstractDriverTestCase {
 				}
 
 				content.append("</esi:vars>");
+				LOG.info("Backend response:\n" + content.toString());
 
 				return createHttpResponse().entity(new StringEntity(content.toString(), ContentType.TEXT_HTML)).build();
 			}
@@ -189,9 +210,11 @@ public class DriverEsiVariablesTest extends AbstractDriverTestCase {
 		driverProxy(driver, request, new EsiRenderer());
 
 		HttpResponse response = TestUtils.getResponse(request);
+		String entityContent = EntityUtils.toString(response.getEntity());
+		LOG.info("Esigate response: \n" + entityContent);
 
 		String[] expectedArray = StringUtils.splitByWholeSeparator(expected.toString(), "<p>");
-		String[] resultArray = StringUtils.splitByWholeSeparator(EntityUtils.toString(response.getEntity()), "<p>");
+		String[] resultArray = StringUtils.splitByWholeSeparator(entityContent, "<p>");
 
 		for (int i = 0; i < expectedArray.length; i++) {
 			String varName = expectedArray[i].substring(0, expectedArray[i].indexOf(":"));
@@ -202,12 +225,12 @@ public class DriverEsiVariablesTest extends AbstractDriverTestCase {
 	}
 
 	static void addVariable(StringBuilder sb, String variable) {
-		sb.append("<p>" + variable + ": $(" + variable + ")</p>");
+		sb.append("<p>" + variable + ": $(" + variable + ")</p>\n");
 		LOG.info("Adding {} for evaluation", variable);
 	}
 
 	static void addVariable(StringBuilder sb, String variable, String value) {
-		sb.append("<p>" + variable + ": " + value + "</p>");
+		sb.append("<p>" + variable + ": " + value + "</p>\n");
 		LOG.info("Adding {} with expected result {}", variable, value);
 
 	}

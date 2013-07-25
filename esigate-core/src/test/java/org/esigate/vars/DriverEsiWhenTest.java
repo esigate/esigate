@@ -49,8 +49,16 @@ public class DriverEsiWhenTest extends AbstractDriverTestCase {
 		final StringBuilder expected = new StringBuilder();
 		addExpression(expected, "!(1==1)", false);
 		addExpression(expected, "1==1", true);
+		addExpression(expected, "2>=1", true);
+		addExpression(expected, "2>1", true);
+		addExpression(expected, "1>2", false);
+		addExpression(expected, "2<1", false);
+		addExpression(expected, "1<2", true);
+		addExpression(expected, "2<=1", false);		
+		addExpression(expected, "1<=2", true);		
 		addExpression(expected, "$(HTTP_COOKIE{test-cookie})==test-cookie-value", true);
 		addExpression(expected, "$(HTTP_COOKIE{test-cookie})=='test-cookie-value'", true);
+		addExpression(expected, "$(HTTP_COOKIE{test-cookie})!='test-cookie-not-this-value'", true);
 
 		addExpression(expected, "$(HTTP_REFERER)==http://www.esigate.org", true);
 		addExpression(expected, "$(HTTP_HOST)=='test.mydomain.fr'", true);
@@ -70,6 +78,8 @@ public class DriverEsiWhenTest extends AbstractDriverTestCase {
 					addExpression(content, expr.substring(0, expr.indexOf(": ")));
 				}
 
+				LOG.info("Backend response:\n" + content.toString());
+				
 				return createHttpResponse().entity(new StringEntity(content.toString(), ContentType.TEXT_HTML)).build();
 			}
 		};
@@ -80,9 +90,11 @@ public class DriverEsiWhenTest extends AbstractDriverTestCase {
 		driverProxy(driver, request, new EsiRenderer());
 
 		HttpResponse response = TestUtils.getResponse(request);
+		String entityContent = EntityUtils.toString(response.getEntity());
+		LOG.info("Esigate response: \n" + entityContent);
 
 		String[] expectedArray = StringUtils.splitByWholeSeparator(expected.toString(), "<p>");
-		String[] resultArray = StringUtils.splitByWholeSeparator(EntityUtils.toString(response.getEntity()), "<p>");
+		String[] resultArray = StringUtils.splitByWholeSeparator(entityContent, "<p>");
 
 		for (int i = 0; i < expectedArray.length; i++) {
 			String varName = expectedArray[i].substring(0, expectedArray[i].indexOf(":"));
@@ -94,13 +106,13 @@ public class DriverEsiWhenTest extends AbstractDriverTestCase {
 
 	static void addExpression(StringBuilder sb, String expr) {
 		sb.append("<p>" + expr + ": " + "<esi:choose>" + "<esi:when test=\"" + expr + "\">true</esi:when>"
-				+ "<esi:otherwise>false</esi:otherwise>" + "</esi:choose>" + "</p>");
+				+ "<esi:otherwise>false</esi:otherwise>" + "</esi:choose>" + "</p>\n");
 
 		LOG.info("Adding {} for evaluation", expr);
 	}
 
 	static void addExpression(StringBuilder sb, String expr, boolean value) {
-		sb.append("<p>" + expr + ": " + value + "</p>");
+		sb.append("<p>" + expr + ": " + value + "</p>\n");
 		if (LOG.isInfoEnabled()) {
 			LOG.info("Adding {} with expected result {}", expr, String.valueOf(value));
 		}
