@@ -75,12 +75,15 @@
 		<developer>
 			<id>nricheton</id>
 			<name>Nicolas Richeton</name>
+			<email>nicolas.richeton@gmail.com</email>
 			<url>http://blog.richeton.com</url>
+			
 		</developer>
 		<developer>
 			<id>athaveau</id>
 			<name>Alexis Thaveau</name>
 			<email>alexis.thaveau@gmail.com</email>
+	
 		</developer>
 		<developer>
 			<id>bibimax</id>
