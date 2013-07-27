@@ -134,9 +134,17 @@ public class VariablesResolver {
 				}
 
 				String value = getProperty(var, arg, request);
-				if (value != null) {
-					result = result.replace(group, value);
+
+				// 4.2 Variable Default Values
+				// Variables whose values are empty, nonexistent variables and
+				// undefined substructures of variables will evaluate to an
+				// empty string when they are accessed.
+				if (value == null) {
+					value = StringUtils.EMPTY;
 				}
+
+				result = result.replace(group, value);
+
 			}
 
 		}
@@ -164,7 +172,7 @@ public class VariablesResolver {
 			String langs = HttpRequestHelper.getFirstHeader("Accept-Language", request);
 			if (arg == null) {
 				res = langs;
-			} else if (langs ==null || langs.indexOf(arg) == -1) {
+			} else if (langs == null || langs.indexOf(arg) == -1) {
 				res = "false";
 			} else {
 				res = "true";

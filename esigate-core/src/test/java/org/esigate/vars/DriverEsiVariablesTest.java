@@ -86,18 +86,18 @@ public class DriverEsiVariablesTest extends AbstractDriverTestCase {
 		addVariable(expected, "HTTP_USER_AGENT{browser}", "MOZILLA");
 		addVariable(expected, "HTTP_USER_AGENT{os}", "MAC");
 		addVariable(expected, "HTTP_COOKIE{test-cookie}", "test-cookie-value");
+		addVariable(expected, "HTTP_COOKIE{missing}", "");
+		addVariable(expected, "QUERY_STRING{missing}", "");
 
 		// TODO: The following are failing tests
 		// addExpression(expected, "HTTP_USER_AGENT{version}",
 		// "4.0");
 		// addExpression(expected, "HTTP_COOKIE",
 		// "test-cookie=test-cookie-value; test-cookie2=test-cookie-value2");
-		// addExpression(expected, "HTTP_COOKIE{missing}", "");
 		// addExpression(expected, "QUERY_STRING{missing}|default-value",
 		// "default-value");
 		// addExpression(expected, "QUERY_STRING{missing}|'default value'",
 		// "default value");
-		// addExpression(expected, "QUERY_STRING{missing}", "");
 
 		// Setup remote server (provider) response.
 		HttpRequestExecutor mockExecutor = new HttpRequestExecutor() {
@@ -169,18 +169,16 @@ public class DriverEsiVariablesTest extends AbstractDriverTestCase {
 		addVariable(expected, "HTTP_USER_AGENT", "Mozilla/5.0 (Windows; U; MSIE 9.0; WIndows NT 9.0; en-US)");
 		addVariable(expected, "HTTP_USER_AGENT{browser}", "MSIE");
 		addVariable(expected, "HTTP_USER_AGENT{os}", "WIN");
+		addVariable(expected, "HTTP_ACCEPT_LANGUAGE", "");
+		addVariable(expected, "QUERY_STRING{test}", "");
+		addVariable(expected, "QUERY_STRING", "");
+		addVariable(expected, "HTTP_REFERER", "");
+		addVariable(expected, "HTTP_COOKIE{test-cookie}", "");
+		addVariable(expected, "HTTP_COOKIE", "");
+		addVariable(expected, "QUERY_STRING{missing}", "");
 
 		// TODO: The following are failing tests
-		// addExpression(expected, "HTTP_ACCEPT_LANGUAGE", "");
-		// addExpression(expected, "QUERY_STRING{test}", "");
-		// addExpression(expected, "QUERY_STRING", "");
-		// addExpression(expected, "HTTP_REFERER", "");
-		// addExpression(expected, "HTTP_COOKIE{test-cookie}", "");
-		// addExpression(expected, "HTTP_USER_AGENT{version}",
-		// "4.0");
-		// addExpression(expected, "HTTP_COOKIE",
-		// "");
-		// addExpression(expected, "QUERY_STRING{missing}", "");
+		// addVariable(expected, "HTTP_USER_AGENT{version}", "4.0");
 
 		// Setup remote server (provider) response.
 		HttpRequestExecutor mockExecutor = new HttpRequestExecutor() {
