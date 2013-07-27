@@ -180,10 +180,8 @@ public class VariablesResolver {
 			String langs = HttpRequestHelper.getFirstHeader("Accept-Language", request);
 			if (arg == null) {
 				res = langs;
-			} else if (langs == null || langs.indexOf(arg) == -1) {
-				res = "false";
 			} else {
-				res = "true";
+				res = String.valueOf(!(langs == null || langs.indexOf(arg) == -1));
 			}
 		} else if (var.indexOf("HTTP_HOST") != -1) {
 			res = HttpRequestHelper.getFirstHeader("Host", request);
