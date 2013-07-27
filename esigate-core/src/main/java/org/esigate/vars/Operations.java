@@ -2,6 +2,13 @@ package org.esigate.vars;
 
 import java.util.ArrayList;
 
+/**
+ * Support for ESI expressions.
+ * 
+ * @author Alexis Thaveau
+ * @author Nicolas Richeton
+ * 
+ */
 public class Operations {
 
 	private static boolean executeOperation(String op) {
@@ -13,7 +20,7 @@ public class Operations {
 		try {
 			if (op.indexOf("==") != -1) {
 				i = op.indexOf("==");
-				op1 = VarUtils.removeSimpleQuotes( op.substring(0, i));
+				op1 = VarUtils.removeSimpleQuotes(op.substring(0, i));
 				op2 = VarUtils.removeSimpleQuotes(op.substring(i + 2));
 
 				dop1 = getOperandAsNumeric(op1);
@@ -150,8 +157,6 @@ public class Operations {
 		}
 		return d;
 	}
-
-	
 
 	public static boolean processOperators(String test) {
 

@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
  * Manage variables replacement
  * 
  * @author Alexis Thaveau
+ * @author Nicolas Richeton
  */
 public class VariablesResolver {
 
@@ -51,7 +52,6 @@ public class VariablesResolver {
 	private static Properties properties;
 
 	private VariablesResolver() {
-
 	}
 
 	/**
@@ -133,15 +133,17 @@ public class VariablesResolver {
 				// empty string when they are accessed.
 				String defaultValue = StringUtils.EMPTY;
 				// try to find argument
-				try {
-					arg = var.substring(var.indexOf('{') + 1, var.indexOf('}'));
-				} catch (Exception e) {
+
+				int argIndex = var.indexOf('{');
+				if (argIndex != -1) {
+					arg = var.substring(argIndex + 1, var.indexOf('}'));
 				}
-				
+
 				// try to find default value
 				int defaultValueIndex = var.indexOf('|');
-					if( defaultValueIndex != -1)
+				if (defaultValueIndex != -1) {
 					defaultValue = VarUtils.removeSimpleQuotes(var.substring(defaultValueIndex + 1));
+				}
 
 				String value = getProperty(var, arg, request);
 
@@ -156,8 +158,6 @@ public class VariablesResolver {
 		}
 		return result;
 	}
-	
-	
 
 	private static String getProperty(String var, String arg, HttpRequest request) {
 		String result = processVar(var, arg, request);
