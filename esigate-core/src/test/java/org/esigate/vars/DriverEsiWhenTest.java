@@ -1,3 +1,17 @@
+/* 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package org.esigate.vars;
 
 import java.io.IOException;
@@ -27,6 +41,12 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Test for &lt;esi:when &gt; esi tag.
+ * 
+ * @author Nicolas Richeton
+ * 
+ */
 public class DriverEsiWhenTest extends AbstractDriverTestCase {
 	private static final Logger LOG = LoggerFactory.getLogger(DriverEsiWhenTest.class);
 
@@ -48,14 +68,24 @@ public class DriverEsiWhenTest extends AbstractDriverTestCase {
 
 		final StringBuilder expected = new StringBuilder();
 		addExpression(expected, "!(1==1)", false);
+		addExpression(expected, "!(a==a)", false);
+		addExpression(expected, "!(a==b)", true);
 		addExpression(expected, "1==1", true);
+		addExpression(expected, "a==a", true);
+		addExpression(expected, "a==b", false);
 		addExpression(expected, "2>=1", true);
+		addExpression(expected, "1>=1", true);
+		addExpression(expected, "b>=a", true);
+		addExpression(expected, "a>=b", false);
 		addExpression(expected, "2>1", true);
+		addExpression(expected, "b>a", true);
 		addExpression(expected, "1>2", false);
+		addExpression(expected, "a>b", false);
 		addExpression(expected, "2<1", false);
+		addExpression(expected, "b<a", false);
 		addExpression(expected, "1<2", true);
-		addExpression(expected, "2<=1", false);		
-		addExpression(expected, "1<=2", true);		
+		addExpression(expected, "2<=1", false);
+		addExpression(expected, "1<=2", true);
 		addExpression(expected, "$(HTTP_COOKIE{test-cookie})==test-cookie-value", true);
 		addExpression(expected, "$(HTTP_COOKIE{test-cookie})=='test-cookie-value'", true);
 		addExpression(expected, "$(HTTP_COOKIE{test-cookie})!='test-cookie-not-this-value'", true);
@@ -79,7 +109,7 @@ public class DriverEsiWhenTest extends AbstractDriverTestCase {
 				}
 
 				LOG.info("Backend response:\n" + content.toString());
-				
+
 				return createHttpResponse().entity(new StringEntity(content.toString(), ContentType.TEXT_HTML)).build();
 			}
 		};
@@ -104,14 +134,14 @@ public class DriverEsiWhenTest extends AbstractDriverTestCase {
 
 	}
 
-	static void addExpression(StringBuilder sb, String expr) {
+	protected static void addExpression(StringBuilder sb, String expr) {
 		sb.append("<p>" + expr + ": " + "<esi:choose>" + "<esi:when test=\"" + expr + "\">true</esi:when>"
 				+ "<esi:otherwise>false</esi:otherwise>" + "</esi:choose>" + "</p>\n");
 
 		LOG.info("Adding {} for evaluation", expr);
 	}
 
-	static void addExpression(StringBuilder sb, String expr, boolean value) {
+	protected static void addExpression(StringBuilder sb, String expr, boolean value) {
 		sb.append("<p>" + expr + ": " + value + "</p>\n");
 		if (LOG.isInfoEnabled()) {
 			LOG.info("Adding {} with expected result {}", expr, String.valueOf(value));
