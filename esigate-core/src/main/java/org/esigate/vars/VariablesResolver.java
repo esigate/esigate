@@ -127,19 +127,20 @@ public class VariablesResolver {
 				String group = matcher.group();
 				String var = group.substring(2, group.length() - 1);
 				String arg = null;
-				// 4.2 Variable Default Values
-				// Variables whose values are empty, nonexistent variables and
-				// undefined substructures of variables will evaluate to an
-				// empty string when they are accessed.
-				String defaultValue = StringUtils.EMPTY;
-				// try to find argument
 
+				// try to find argument
 				int argIndex = var.indexOf('{');
 				if (argIndex != -1) {
 					arg = var.substring(argIndex + 1, var.indexOf('}'));
 				}
 
 				// try to find default value
+				// ESI 1.0 spec :
+				// 4.2 Variable Default Values
+				// Variables whose values are empty, nonexistent variables and
+				// undefined substructures of variables will evaluate to an
+				// empty string when they are accessed.
+				String defaultValue = StringUtils.EMPTY;
 				int defaultValueIndex = var.indexOf('|');
 				if (defaultValueIndex != -1) {
 					defaultValue = VarUtils.removeSimpleQuotes(var.substring(defaultValueIndex + 1));
