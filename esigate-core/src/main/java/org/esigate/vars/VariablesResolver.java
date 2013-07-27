@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
 public class VariablesResolver {
 
 	private static final Logger LOG = LoggerFactory.getLogger(VariablesResolver.class);
+	private static Pattern userAgentVersion = Pattern.compile("^[A-Za-z]+/([0-9]+\\.[0-9]+)");
 
 	static {
 		// Load default settings
@@ -204,7 +205,8 @@ public class VariablesResolver {
 			if (arg == null) {
 				res = HttpRequestHelper.getFirstHeader("User-agent", request);
 			} else {
-				String userAgent = HttpRequestHelper.getFirstHeader("User-Agent", request).toLowerCase();
+				String userAgent = StringUtils.defaultString(HttpRequestHelper.getFirstHeader("User-Agent", request))
+						.toLowerCase();
 				if (arg.equals("os")) {
 					if (userAgent.indexOf("unix") != -1) {
 						res = "UNIX";
@@ -220,6 +222,12 @@ public class VariablesResolver {
 						res = "MSIE";
 					} else {
 						res = "MOZILLA";
+					}
+				} else if (arg.equals("version")) {
+					Matcher m = userAgentVersion.matcher(userAgent);
+
+					if (m.find()) {
+						res = m.group(1);
 					}
 				}
 			}
@@ -237,5 +245,4 @@ public class VariablesResolver {
 		}
 		return res;
 	}
-
 }
