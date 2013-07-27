@@ -127,20 +127,26 @@ public class VariablesResolver {
 				String group = matcher.group();
 				String var = group.substring(2, group.length() - 1);
 				String arg = null;
+				// 4.2 Variable Default Values
+				// Variables whose values are empty, nonexistent variables and
+				// undefined substructures of variables will evaluate to an
+				// empty string when they are accessed.
+				String defaultValue = StringUtils.EMPTY;
 				// try to find argument
 				try {
 					arg = var.substring(var.indexOf('{') + 1, var.indexOf('}'));
 				} catch (Exception e) {
 				}
+				
+				// try to find default value
+				int defaultValueIndex = var.indexOf('|');
+					if( defaultValueIndex != -1)
+					defaultValue = VarUtils.removeSimpleQuotes(var.substring(defaultValueIndex + 1));
 
 				String value = getProperty(var, arg, request);
 
-				// 4.2 Variable Default Values
-				// Variables whose values are empty, nonexistent variables and
-				// undefined substructures of variables will evaluate to an
-				// empty string when they are accessed.
 				if (value == null) {
-					value = StringUtils.EMPTY;
+					value = defaultValue;
 				}
 
 				result = result.replace(group, value);
@@ -150,6 +156,8 @@ public class VariablesResolver {
 		}
 		return result;
 	}
+	
+	
 
 	private static String getProperty(String var, String arg, HttpRequest request) {
 		String result = processVar(var, arg, request);

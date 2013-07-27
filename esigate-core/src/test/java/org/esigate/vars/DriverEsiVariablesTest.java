@@ -94,10 +94,8 @@ public class DriverEsiVariablesTest extends AbstractDriverTestCase {
 		// "4.0");
 		// addExpression(expected, "HTTP_COOKIE",
 		// "test-cookie=test-cookie-value; test-cookie2=test-cookie-value2");
-		// addExpression(expected, "QUERY_STRING{missing}|default-value",
-		// "default-value");
-		// addExpression(expected, "QUERY_STRING{missing}|'default value'",
-		// "default value");
+		addVariable(expected, "QUERY_STRING{missing}|default-value", "default-value");
+		addVariable(expected, "QUERY_STRING{missing}|'default value'", "default value");
 
 		// Setup remote server (provider) response.
 		HttpRequestExecutor mockExecutor = new HttpRequestExecutor() {

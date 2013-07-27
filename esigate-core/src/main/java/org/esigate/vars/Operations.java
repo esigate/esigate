@@ -13,8 +13,8 @@ public class Operations {
 		try {
 			if (op.indexOf("==") != -1) {
 				i = op.indexOf("==");
-				op1 = removeSimpleQuotes( op.substring(0, i));
-				op2 = removeSimpleQuotes(op.substring(i + 2));
+				op1 = VarUtils.removeSimpleQuotes( op.substring(0, i));
+				op2 = VarUtils.removeSimpleQuotes(op.substring(i + 2));
 
 				dop1 = getOperandAsNumeric(op1);
 				dop2 = getOperandAsNumeric(op2);
@@ -26,8 +26,8 @@ public class Operations {
 
 			} else if (op.indexOf("!=") != -1) {
 				i = op.indexOf("!=");
-				op1 = removeSimpleQuotes(op.substring(0, i));
-				op2 = removeSimpleQuotes(op.substring(i + 2));
+				op1 = VarUtils.removeSimpleQuotes(op.substring(0, i));
+				op2 = VarUtils.removeSimpleQuotes(op.substring(i + 2));
 
 				dop1 = getOperandAsNumeric(op1);
 				dop2 = getOperandAsNumeric(op2);
@@ -39,8 +39,8 @@ public class Operations {
 
 			} else if (op.indexOf(">=") != -1) {
 				i = op.indexOf(">=");
-				op1 = removeSimpleQuotes(op.substring(0, i));
-				op2 = removeSimpleQuotes(op.substring(i + 2));
+				op1 = VarUtils.removeSimpleQuotes(op.substring(0, i));
+				op2 = VarUtils.removeSimpleQuotes(op.substring(i + 2));
 
 				dop1 = getOperandAsNumeric(op1);
 				dop2 = getOperandAsNumeric(op2);
@@ -52,8 +52,8 @@ public class Operations {
 
 			} else if (op.indexOf("<=") != -1) {
 				i = op.indexOf("<=");
-				op1 = removeSimpleQuotes(op.substring(0, i));
-				op2 = removeSimpleQuotes(op.substring(i + 2));
+				op1 = VarUtils.removeSimpleQuotes(op.substring(0, i));
+				op2 = VarUtils.removeSimpleQuotes(op.substring(i + 2));
 
 				dop1 = getOperandAsNumeric(op1);
 				dop2 = getOperandAsNumeric(op2);
@@ -66,8 +66,8 @@ public class Operations {
 
 			} else if (op.indexOf(">") != -1) {
 				i = op.indexOf(">");
-				op1 = removeSimpleQuotes(op.substring(0, i));
-				op2 = removeSimpleQuotes(op.substring(i + 1));
+				op1 = VarUtils.removeSimpleQuotes(op.substring(0, i));
+				op2 = VarUtils.removeSimpleQuotes(op.substring(i + 1));
 
 				dop1 = getOperandAsNumeric(op1);
 				dop2 = getOperandAsNumeric(op2);
@@ -79,8 +79,8 @@ public class Operations {
 				return cmp > 0;
 			} else if (op.indexOf("<") != -1) {
 				i = op.indexOf("<");
-				op1 = removeSimpleQuotes(op.substring(0, i));
-				op2 = removeSimpleQuotes(op.substring(i + 1));
+				op1 = VarUtils.removeSimpleQuotes(op.substring(0, i));
+				op2 = VarUtils.removeSimpleQuotes(op.substring(i + 1));
 
 				dop1 = getOperandAsNumeric(op1);
 				dop2 = getOperandAsNumeric(op2);
@@ -151,13 +151,7 @@ public class Operations {
 		return d;
 	}
 
-	private static String removeSimpleQuotes(String s) {
-		if (s.startsWith("'") && s.endsWith("'")) {
-			return s.substring(1, s.length() - 1);
-		}
-		return s;
-
-	}
+	
 
 	public static boolean processOperators(String test) {
 
