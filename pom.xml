@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.sonatype.oss</groupId>
@@ -77,13 +78,13 @@
 			<name>Nicolas Richeton</name>
 			<email>nicolas.richeton@gmail.com</email>
 			<url>http://blog.richeton.com</url>
-			
+
 		</developer>
 		<developer>
 			<id>athaveau</id>
 			<name>Alexis Thaveau</name>
 			<email>alexis.thaveau@gmail.com</email>
-	
+
 		</developer>
 		<developer>
 			<id>bibimax</id>
@@ -418,7 +419,7 @@
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>
 				<version>4.8.2</version>
-					<!-- Junit must be provided in order to compile org.esigate.test package. 
+				<!-- Junit must be provided in order to compile org.esigate.test package. 
 					This scope ensure it is not included in war -->
 				<scope>provided</scope>
 			</dependency>
@@ -637,6 +638,11 @@
 				create -->
 			<url>scp://shell.sourceforge.net/home/project-web/webassembletool/htdocs</url>
 		</site>
+		<snapshotRepository>
+			<id>sonatype-nexus-snapshots</id>
+			<name>Sonatype Nexus Snapshots</name>
+			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+		</snapshotRepository>
 	</distributionManagement>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
