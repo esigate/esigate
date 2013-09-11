@@ -17,6 +17,7 @@ package org.esigate.impl;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.esigate.ConfigurationException;
 
 /**
@@ -145,5 +146,10 @@ public class UriMapping {
 
 	public String getHost() {
 		return this.host;
+	}
+	
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this);
 	}
 }

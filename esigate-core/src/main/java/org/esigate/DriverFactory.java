@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.esigate.impl.IndexedInstances;
 import org.esigate.impl.UriMapping;
 import org.slf4j.Logger;
@@ -38,6 +40,12 @@ import org.slf4j.LoggerFactory;
  * @author Nicolas Richeton
  */
 public class DriverFactory {
+
+	/**
+	 * System property used to specify of esigate configuration, outside of the
+	 * classpath.
+	 */
+	public static final String PROP_CONF_LOCATION = "esigate.config";
 	private static IndexedInstances INSTANCES = new IndexedInstances(new HashMap<String, Driver>());
 	private static final String DEFAULT_INSTANCE_NAME = "default";
 	private static final Logger LOG = LoggerFactory.getLogger(DriverFactory.class);
@@ -58,13 +66,13 @@ public class DriverFactory {
 
 		try {
 			// Load from environment
-			String envPath = System.getProperty("esigate.config");
+			String envPath = System.getProperty(PROP_CONF_LOCATION);
 			if (envPath != null) {
 				try {
 					LOG.info("Scanning configuration {}", envPath);
 					inputStream = new FileInputStream(new File(envPath));
 				} catch (FileNotFoundException e) {
-					LOG.error("Can't read file {} (from -Desigate.config)", envPath, e);
+					LOG.error("Can't read file {} (from -D" + PROP_CONF_LOCATION + ")", envPath, e);
 				}
 			}
 
@@ -203,13 +211,15 @@ public class DriverFactory {
 	 *            HTTP protocol
 	 * @param url
 	 *            The requested url
-	 * @return
+	 * @return a pair which contains the Driver to use with this request and the
+	 *         matched UriMapping.
 	 * @throws HttpErrorPage
 	 */
-	public static Driver getInstanceFor(String scheme, String host, String url) throws HttpErrorPage {
+public static Pair<Driver, UriMapping> getInstanceFor(String scheme, String host, String url) throws HttpErrorPage {
 		for (UriMapping mapping : INSTANCES.getUrimappings().keySet()) {
 			if (mapping.matches(scheme, host, url)) {
-				return getInstance(INSTANCES.getUrimappings().get(mapping));
+				return new ImmutablePair<Driver, UriMapping>(getInstance(INSTANCES.getUrimappings().get(mapping)),
+						mapping);
 			}
 		}
 

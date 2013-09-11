@@ -23,10 +23,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.tuple.Pair;
+import org.esigate.Driver;
 import org.esigate.DriverFactory;
 import org.esigate.HttpErrorPage;
-import org.esigate.aggregator.AggregateRenderer;
-import org.esigate.esi.EsiRenderer;
+import org.esigate.impl.UriMapping;
 import org.esigate.servlet.impl.DriverSelector;
 import org.esigate.servlet.impl.RequestUrl;
 import org.slf4j.Logger;
@@ -56,7 +57,7 @@ public class ProxyServlet extends HttpServlet {
 	/**
 	 * Get current Driver selector. This is mainly used for unit testing.
 	 * 
-	 * @return
+	 * @return current Driver selector
 	 */
 	public DriverSelector getDriverSelector() {
 		return this.driverSelector;
@@ -65,12 +66,13 @@ public class ProxyServlet extends HttpServlet {
 	@Override
 	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
-		String relUrl = RequestUrl.getRelativeUrl(request);
-		LOG.debug("Proxying {}", relUrl);
+	HttpServletMediator mediator = new HttpServletMediator(request, response, getServletContext());
 
-		HttpServletMediator mediator = new HttpServletMediator(request, response, getServletContext());
 		try {
-			this.driverSelector.selectProvider(request).proxy(relUrl, mediator.getHttpRequest(), new AggregateRenderer(), new EsiRenderer());
+			Pair<Driver, UriMapping> dm = this.driverSelector.selectProvider(request);
+			String relUrl = RequestUrl.getRelativeUrl(request, dm.getRight());
+			LOG.debug("Proxying {}", relUrl);
+			dm.getLeft().proxy(relUrl, mediator.getHttpRequest());
 		} catch (HttpErrorPage e) {
 			mediator.sendResponse(e.getHttpResponse());
 		}
