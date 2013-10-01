@@ -216,6 +216,18 @@ provider3.mappings=*.php
 theme.remoteUrlBase=http://host4/
 theme.mappings=/css/*, /images/*
 	]]></source> 
+	        </subsection>  
+	        
+	   <subsection name="Enable multi-threaded ESI ()ALPHA)">
+	        <p>Using several threads when processing ESI tags, especially esi:include, can give major performance gains. However, this is more resource intensive and may degrade performance for simple cases and/or when most requests are cached.
+	        This feature is available in 4.2 for testing and will be available for everyone in 5.0. This feature is disabled by default.
+	        </p>
+	       
+	        <p>To enable this feature, open WEB-INF/web.xml and replace :</p>
+	        <source><![CDATA[org.esigate.servlet.AggregatorServlet	]]></source> 
+	        <p>By:</p>
+	        <source><![CDATA[org.esigate.servlet.ParallelAggregatorServlet	]]></source> 
+	    
 	        </subsection>
 		</section>
 		<section name="Configuration">

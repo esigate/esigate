@@ -101,7 +101,7 @@ class ParserContextImpl implements ParserContext {
 	}
 
 	public HttpEntityEnclosingRequest getHttpRequest() {
-		return httpRequest;
+		return this.httpRequest;
 	}
 
 	private static class Pair {
@@ -122,9 +122,11 @@ class ParserContextImpl implements ParserContext {
 		}
 
 		public void onTagStart(String tag, ParserContext ctx) {
+			// Nothing to do, this is the root tag
 		}
 
 		public void onTagEnd(String tag, ParserContext ctx) {
+			// Nothing to do, this is the root tag
 		}
 
 		public boolean onError(Exception e, ParserContext ctx) {
@@ -132,7 +134,7 @@ class ParserContextImpl implements ParserContext {
 		}
 
 		public void characters(CharSequence csq, int start, int end) throws IOException {
-			root.append(csq, start, end);
+			this.root.append(csq, start, end);
 		}
 
 		public boolean isClosed() {
@@ -141,6 +143,6 @@ class ParserContextImpl implements ParserContext {
 	}
 
 	public HttpResponse getHttpResponse() {
-		return httpResponse;
+		return this.httpResponse;
 	}
 }

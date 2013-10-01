@@ -58,8 +58,6 @@ class ReplaceElement extends BaseElement {
 		} else {
 			parent.characters(result, 0, result.length());
 		}
-
-		buf = null;
 	}
 
 	@Override

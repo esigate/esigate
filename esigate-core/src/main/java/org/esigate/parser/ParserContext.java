@@ -19,6 +19,11 @@ import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 
+/**
+ * The current context used during parsing.
+ * 
+ * @author Francois-Xavier Bonnet
+ */
 public interface ParserContext {
 
 	/** @return {@linkplain HttpRequest} associated with current processing. */
