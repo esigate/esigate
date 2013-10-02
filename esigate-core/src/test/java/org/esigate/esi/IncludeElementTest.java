@@ -27,6 +27,7 @@ import org.esigate.HttpErrorPage;
 import org.esigate.MockDriver;
 import org.esigate.Parameters;
 import org.esigate.test.TestUtils;
+import org.junit.Ignore;
 
 public class IncludeElementTest extends TestCase {
 
@@ -131,6 +132,16 @@ public class IncludeElementTest extends TestCase {
 		assertEquals("before ---fetched inline cache item--- after", out.toString());
 	}
 
+	/**
+	 * This test is part of the ESI test suite, but the behavior is unspecified
+	 * with multi-threaded parsing.
+	 * <p>
+	 * We keep this test as a reminder
+	 * 
+	 * @throws IOException
+	 * @throws HttpErrorPage
+	 */
+	@Ignore
 	public void testIncludeInlineElement() throws IOException, HttpErrorPage {
 		String page = "before <esi:include src='$(PROVIDER{mock})/inline-cache' /> middle "
 				+ "<esi:inline name='$(PROVIDER{mock})/inline-cache' fetchable='false'>---inline cache item---</esi:inline>" + "<esi:include src='$(PROVIDER{mock})/inline-cache' /> after";
