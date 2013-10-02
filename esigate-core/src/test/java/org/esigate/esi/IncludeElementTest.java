@@ -133,15 +133,7 @@ public class IncludeElementTest extends TestCase {
 		assertEquals("before ---fetched inline cache item--- after", out.toString());
 	}
 
-	/**
-	 * This test is part of the ESI test suite, but the behavior is unspecified
-	 * with multi-threaded parsing.
-	 * <p>
-	 * We keep this test as a reminder
-	 * 
-	 * @throws IOException
-	 * @throws HttpErrorPage
-	 */
+	
 	public void testIncludeInlineElement() throws IOException, HttpErrorPage {
 		String page = "before <esi:include src='$(PROVIDER{mock})/inline-cache' /> middle "
 				+ "<esi:inline name='$(PROVIDER{mock})/inline-cache' fetchable='false'>---inline cache item---</esi:inline>"
@@ -149,10 +141,8 @@ public class IncludeElementTest extends TestCase {
 		provider.addResource("/inline-cache", "---fetched inline cache item---");
 		StringWriter out = new StringWriter();
 		tested.render(request, page, out);
-		// Behavior is unspecified : switch from success to failure due to
-		// timing issues.
-		// assertEquals("before ---fetched inline cache item--- middle ---inline cache item--- after",
-		// out.toString());
+		 assertEquals("before ---fetched inline cache item--- middle ---inline cache item--- after",
+		 out.toString());
 	}
 
 	public void testIncludeReplaceElementFragment() throws IOException, HttpErrorPage {
