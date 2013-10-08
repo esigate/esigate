@@ -79,7 +79,7 @@ public class FetchLogging implements Extension, IEventListener {
 			if (LOG.isInfoEnabled() || statusCode >= 400) {
 				HttpRequest lastRequest = e.httpRequest;
 
-				HttpHost host = (HttpHost) lastRequest.getParams().getParameter(HttpClientHelper.TARGET_HOST);
+				HttpHost targetHost = (HttpHost) lastRequest.getParams().getParameter(HttpClientHelper.TARGET_HOST);
 
 				String url = lastRequest.getRequestLine().toString();
 				String status = e.httpResponse.getStatusLine().toString();
@@ -89,25 +89,29 @@ public class FetchLogging implements Extension, IEventListener {
 
 				long time = System.currentTimeMillis() - (Long) e.httpContext.removeAttribute(TIME);
 
-				StringBuilder logMessageBuilder = new StringBuilder();
-				// Display real request target
-				if (host != null) {
-					logMessageBuilder.append(host.getSchemeName());
-					logMessageBuilder.append("://");
-					logMessageBuilder.append(host.getHostName());
-					if (host.getPort() != -1) {
-						logMessageBuilder.append(":");
-						logMessageBuilder.append(host.getPort());
+				StringBuilder logMessage = new StringBuilder();
+			
+				// Display target host, protocol and port
+				if (targetHost != null) {
+					logMessage.append(targetHost.getSchemeName());
+					logMessage.append("://");
+					logMessage.append(targetHost.getHostName());
+					
+					if (targetHost.getPort() != -1) {
+						logMessage.append(":");
+						logMessage.append(targetHost.getPort());
 					}
+					
+					logMessage.append(" - ");
 				}
 				// Append request information
-				logMessageBuilder.append(" " + url + " " + reqHeaders + " -> " + status + " (" + time + " ms) " + " "
+				logMessage.append(  url + " " + reqHeaders + " -> " + status + " (" + time + " ms) " + " "
 						+ respHeaders);
 
 				if (statusCode >= 400)
-					LOG.warn(logMessageBuilder.toString());
+					LOG.warn(logMessage.toString());
 				else
-					LOG.info(logMessageBuilder.toString());
+					LOG.info(logMessage.toString());
 			}
 		} else {
 			e.httpContext.setAttribute(TIME, System.currentTimeMillis());
