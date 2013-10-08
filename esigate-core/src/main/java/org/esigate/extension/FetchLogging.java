@@ -79,10 +79,11 @@ public class FetchLogging implements Extension, IEventListener {
 			if (LOG.isInfoEnabled() || statusCode >= 400) {
 				HttpRequest lastRequest = e.httpRequest;
 
+				// Create log message
 				HttpHost targetHost = (HttpHost) lastRequest.getParams().getParameter(HttpClientHelper.TARGET_HOST);
 
-				String url = lastRequest.getRequestLine().toString();
-				String status = e.httpResponse.getStatusLine().toString();
+				String requestLine = lastRequest.getRequestLine().toString();
+				String statusLine = e.httpResponse.getStatusLine().toString();
 
 				String reqHeaders = ArrayUtils.toString(lastRequest.getAllHeaders());
 				String respHeaders = ArrayUtils.toString(e.httpResponse.getAllHeaders());
@@ -105,7 +106,7 @@ public class FetchLogging implements Extension, IEventListener {
 					logMessage.append(" - ");
 				}
 				// Append request information
-				logMessage.append(  url + " " + reqHeaders + " -> " + status + " (" + time + " ms) " + " "
+				logMessage.append(  requestLine + " " + reqHeaders + " -> " + statusLine + " (" + time + " ms) " + " "
 						+ respHeaders);
 
 				if (statusCode >= 400)
