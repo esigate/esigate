@@ -81,7 +81,7 @@ public class HttpClientHelper {
 	private static final Set<String> ENTITY_METHODS = Collections
 			.unmodifiableSet(new HashSet<String>(Arrays.asList("POST", "PUT", "PROPFIND", "PROPPATCH", "MKCOL", "COPY", "MOVE", "LOCK", "UNLOCK")));
 	private static final String ORIGINAL_REQUEST_KEY = "ORIGINAL_REQUEST";
-	private static final String TARGET_HOST = "TARGET_HOST";
+	public static final String TARGET_HOST = "TARGET_HOST";
 	private final boolean preserveHost;
 	private CookieManager cookieManager;
 	private HttpClient httpClient;

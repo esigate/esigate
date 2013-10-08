@@ -18,6 +18,7 @@ package org.esigate.extension;
 import java.util.Properties;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.esigate.Driver;
 import org.esigate.events.Event;
@@ -25,6 +26,7 @@ import org.esigate.events.EventDefinition;
 import org.esigate.events.EventManager;
 import org.esigate.events.IEventListener;
 import org.esigate.events.impl.FetchEvent;
+import org.esigate.http.HttpClientHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,8 +61,7 @@ import org.slf4j.LoggerFactory;
  */
 public class FetchLogging implements Extension, IEventListener {
 	private static final String TIME = "org.esigate.time.external";
-	private static final Logger LOG = LoggerFactory
-			.getLogger(FetchLogging.class);
+	private static final Logger LOG = LoggerFactory.getLogger(FetchLogging.class);
 
 	public void init(Driver driver, Properties properties) {
 		driver.getEventManager().register(EventManager.EVENT_FETCH_POST, this);
@@ -74,28 +75,39 @@ public class FetchLogging implements Extension, IEventListener {
 		if (EventManager.EVENT_FETCH_POST.equals(id)) {
 			int statusCode = e.httpResponse.getStatusLine().getStatusCode();
 
-			// Log only if info or issue 
+			// Log only if info or issue
 			if (LOG.isInfoEnabled() || statusCode >= 400) {
-				HttpRequest lastRequest =e.httpRequest;
+				HttpRequest lastRequest = e.httpRequest;
+
+				HttpHost host = (HttpHost) lastRequest.getParams().getParameter(HttpClientHelper.TARGET_HOST);
 
 				String url = lastRequest.getRequestLine().toString();
 				String status = e.httpResponse.getStatusLine().toString();
 
-				String reqHeaders = ArrayUtils.toString(lastRequest
-						.getAllHeaders());
-				String respHeaders = ArrayUtils.toString(e.httpResponse
-						.getAllHeaders());
+				String reqHeaders = ArrayUtils.toString(lastRequest.getAllHeaders());
+				String respHeaders = ArrayUtils.toString(e.httpResponse.getAllHeaders());
 
-				long time = System.currentTimeMillis()
-						- (Long) e.httpContext.removeAttribute(TIME);
+				long time = System.currentTimeMillis() - (Long) e.httpContext.removeAttribute(TIME);
 
-				String logMessage = url + " " + reqHeaders + " -> " + status
-						+ " (" + time + " ms) "  + " " + respHeaders;
+				StringBuilder logMessageBuilder = new StringBuilder();
+				// Display real request target
+				if (host != null) {
+					logMessageBuilder.append(host.getSchemeName());
+					logMessageBuilder.append("://");
+					logMessageBuilder.append(host.getHostName());
+					if (host.getPort() != -1) {
+						logMessageBuilder.append(":");
+						logMessageBuilder.append(host.getPort());
+					}
+				}
+				// Append request information
+				logMessageBuilder.append(" " + url + " " + reqHeaders + " -> " + status + " (" + time + " ms) " + " "
+						+ respHeaders);
 
 				if (statusCode >= 400)
-					LOG.warn(logMessage);
+					LOG.warn(logMessageBuilder.toString());
 				else
-					LOG.info(logMessage);
+					LOG.info(logMessageBuilder.toString());
 			}
 		} else {
 			e.httpContext.setAttribute(TIME, System.currentTimeMillis());
