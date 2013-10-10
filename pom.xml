@@ -154,13 +154,13 @@
 					<version>2.4</version>
 					 <configuration>
           <archive>
-            <index>true</index>
-            <manifest>
-              <addClasspath>true</addClasspath>
-            </manifest>
+          <manifest>
+          <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+              <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+              </manifest>
             <manifestEntries>
-            
-          <Implementation-Version>${project.version} rev. ${env.SVN_REVISION}</Implementation-Version>
+          <Specification-Version>${project.version}</Specification-Version>   
+          <Implementation-Version>${env.SVN_REVISION}</Implementation-Version>
             </manifestEntries>
           </archive>
         </configuration>
@@ -660,7 +660,6 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<dependency.httpclient.version>4.2.5</dependency.httpclient.version>
 		<currentVersion>${project.version}</currentVersion>
-   		 <build.number>${project.version}</build.number>
 </properties>
 
 </project>

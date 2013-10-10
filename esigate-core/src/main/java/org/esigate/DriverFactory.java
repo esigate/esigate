@@ -53,9 +53,11 @@ public class DriverFactory {
 	private static final Logger LOG = LoggerFactory.getLogger(DriverFactory.class);
 
 	static {
-		String version = defaultIfBlank(DriverFactory.class.getPackage().getImplementationVersion(),
+		String version = defaultIfBlank(DriverFactory.class.getPackage().getSpecificationVersion(),
 				"development version");
-		LOG.info("Starting esigate {} ", version);
+		String rev = defaultIfBlank(DriverFactory.class.getPackage().getImplementationVersion(),
+				"unknown");
+		LOG.info("Starting esigate {} rev. {}", version, rev);
 		
 		// Load default settings
 		configure();
