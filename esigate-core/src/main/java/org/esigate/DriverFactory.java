@@ -15,6 +15,8 @@
 
 package org.esigate;
 
+import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -51,6 +53,10 @@ public class DriverFactory {
 	private static final Logger LOG = LoggerFactory.getLogger(DriverFactory.class);
 
 	static {
+		String version = defaultIfBlank(DriverFactory.class.getPackage().getImplementationVersion(),
+				"development version");
+		LOG.info("Starting esigate {} ", version);
+		
 		// Load default settings
 		configure();
 	}
