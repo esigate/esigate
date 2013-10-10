@@ -160,7 +160,7 @@
             </manifest>
             <manifestEntries>
             
-          <Implementation-Version>${project.version} Build #${build.number}</Implementation-Version>
+          <Implementation-Version>${project.version} rev. ${env.SVN_REVISION}</Implementation-Version>
             </manifestEntries>
           </archive>
         </configuration>
