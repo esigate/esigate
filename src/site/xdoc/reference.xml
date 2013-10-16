@@ -880,9 +880,15 @@ someUrl=/cms/article123
 			<td>&lt;esi:try&gt;</td>
 			<td></td>
 			<td>Try block</td>
-			<td>&lt;esi:try&gt;&lt;esi:attempt&gt;...&lt;/esi:attempt&gt;&lt;esi:except
-			code="404"&gt;...&lt;/esi:except&gt;&lt;esi:except
-			code="500"&gt;...&lt;/esi:except&gt;&lt;esi:except&gt;...&lt;/esi:except&gt;&lt;:esi:try&gt;
+			<td>&lt;esi:try&gt;<br/>
+			&nbsp;&nbsp;&lt;esi:attempt&gt;...&lt;/esi:attempt&gt;<br/>
+			&nbsp;&nbsp;&lt;esi:except code="404"&gt;...&lt;/esi:except&gt;<br/>
+			&nbsp;&nbsp;&lt;esi:except	code="500"&gt;...&lt;/esi:except&gt;<br/>
+			&nbsp;&nbsp;&lt;esi:except&gt;...&lt;/esi:except&gt;<br/>
+			&lt;:esi:try&gt;<br/>
+			<br/>
+			If multiple except tags are present, only the first matching one is used. 
+			As a result, except tags with the <em>code</em> attribute should appear first. 
 			</td>
 			<td>yes</td>
 			<td>yes</td>
@@ -907,9 +913,9 @@ someUrl=/cms/article123
 			<tr>
 			<td></td>
 			<td>code</td>
-			<td>Http return code that trigger this except block</td>
+			<td>Http return code that trigger this except block.</td>
 			<td></td>
-			<td>yes</td>
+			<td></td>
 			<td>yes</td>
 			</tr>
 			<tr>
