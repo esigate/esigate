@@ -16,6 +16,10 @@
 package org.esigate.servlet;
 
 import java.io.IOException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -62,11 +66,12 @@ public class ParallelAggregatorServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOG = LoggerFactory.getLogger(ParallelAggregatorServlet.class);
 	private DriverSelector driverSelector = new DriverSelector();
+	private Executor esiExecutor;
 
 	/**
 	 * Get current Driver selector. This is mainly used for unit testing.
 	 * 
-	 * @return
+	 * @return Current driver selector
 	 */
 	public DriverSelector getDriverSelector() {
 		return this.driverSelector;
@@ -90,7 +95,8 @@ public class ParallelAggregatorServlet extends HttpServlet {
 			LOG.debug("Proxying {}", relUrl);
 			// dm.getLeft().proxy(relUrl, mediator.getHttpRequest(), new
 			// AggregateRenderer(), new EsiRenderer());
-			dm.getLeft().proxy(relUrl, mediator.getHttpRequest(), new AggregateRenderer(), new EsiRenderer());
+			dm.getLeft().proxy(relUrl, mediator.getHttpRequest(), new AggregateRenderer(),
+					new EsiRenderer(this.esiExecutor));
 		} catch (HttpErrorPage e) {
 			mediator.sendResponse(e.getHttpResponse());
 		}
@@ -108,6 +114,20 @@ public class ParallelAggregatorServlet extends HttpServlet {
 		this.driverSelector.setWebXmlProviders(config.getInitParameter("providers"));
 
 		this.driverSelector.setUseMappings("true".equalsIgnoreCase(config.getInitParameter("useMappings")));
+
+		// Thread pool limit for esi
+		String strMaxThreads = config.getInitParameter("esi_max_threads");
+		int maxThreads = 20;
+		if (strMaxThreads != null) {
+			try {
+				maxThreads = Integer.parseInt(strMaxThreads);
+			} catch (NumberFormatException e) {
+				throw new ServletException("Invalid value for esi_max_threads : " + strMaxThreads, e);
+			}
+		}
+
+		this.esiExecutor = new ThreadPoolExecutor(0, maxThreads, 60, TimeUnit.SECONDS, new SynchronousQueue<Runnable>());
+		LOG.info("Multi-threaded ESI processing enabled. Thread limit: {}.", String.valueOf(maxThreads));
 
 		// Force esigate configuration parsing to trigger errors right away (if
 		// any) and prevent delay on first call.

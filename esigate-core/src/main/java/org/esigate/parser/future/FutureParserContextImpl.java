@@ -16,6 +16,7 @@
 package org.esigate.parser.future;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.Future;
 
@@ -41,11 +42,13 @@ class FutureParserContextImpl implements FutureParserContext {
 	private final HttpResponse httpResponse;
 
 	private final Stack<Pair> stack = new Stack<Pair>();
+	private Map<String, Object> data ;
 
-	FutureParserContextImpl(FutureAppendable root, HttpEntityEnclosingRequest httpRequest, HttpResponse httpResponse) {
+	FutureParserContextImpl(FutureAppendable root, HttpEntityEnclosingRequest httpRequest, HttpResponse httpResponse, Map<String,Object> data) {
 		this.root = new RootAdapter(root);
 		this.httpRequest = httpRequest;
 		this.httpResponse = httpResponse;
+		this.data = data;
 	}
 
 	public <T> T findAncestor(Class<T> type) {
@@ -144,7 +147,9 @@ class FutureParserContextImpl implements FutureParserContext {
 			return false;
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see org.esigate.parser.future.FutureElement#getParent()
 		 */
 		public FutureElement getParent() {
@@ -155,5 +160,9 @@ class FutureParserContextImpl implements FutureParserContext {
 
 	public HttpResponse getHttpResponse() {
 		return this.httpResponse;
+	}
+
+	public Object getData(String key) {
+		return this.data == null ? null : this.data.get(key);
 	}
 }

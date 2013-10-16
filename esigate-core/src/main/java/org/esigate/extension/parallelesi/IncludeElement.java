@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.Callable;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.RunnableFuture;
@@ -33,6 +34,7 @@ import org.esigate.Driver;
 import org.esigate.DriverFactory;
 import org.esigate.HttpErrorPage;
 import org.esigate.Renderer;
+import org.esigate.parser.future.CharSequenceFuture;
 import org.esigate.parser.future.FutureElement;
 import org.esigate.parser.future.FutureElementType;
 import org.esigate.parser.future.FutureParserContext;
@@ -61,10 +63,11 @@ class IncludeElement extends BaseElement {
 		Tag includeTag;
 		private Map<String, CharSequence> fragmentReplacements;
 		private Map<String, CharSequence> regexpReplacements;
+		private Executor executor;
 
 		public IncludeTask(Tag includeTag, String src, String alt, FutureParserContext ctx, FutureElement current,
 				boolean ignoreError, Map<String, CharSequence> fragmentReplacements,
-				Map<String, CharSequence> regexpReplacements) {
+				Map<String, CharSequence> regexpReplacements, Executor executor) {
 			this.src = src;
 			this.alt = alt;
 			this.ctx = ctx;
@@ -73,27 +76,49 @@ class IncludeElement extends BaseElement {
 			this.includeTag = includeTag;
 			this.fragmentReplacements = fragmentReplacements;
 			this.regexpReplacements = regexpReplacements;
+			this.executor = executor;
 		}
 
-		public CharSequence call() throws Exception {
+		public CharSequence call() throws IOException, HttpErrorPage {
 			LOG.debug("Starting include task {}", this.src);
 			StringWriter sw = new StringWriter();
 
+			Exception currentException = null;
+			// Handle src
 			try {
 				processPage(this.src, includeTag, this.ctx, sw);
 			} catch (IOException e) {
-				if (alt != null) {
-					processPage(alt, includeTag, ctx, sw);
-				} else if (!ignoreError && !ctx.reportError(current, e)) {
-					throw e;
-				}
+				currentException = e;
 			} catch (HttpErrorPage e) {
-				if (alt != null) {
+				currentException = e;
+			}
+
+			// Handle Alt
+			if (currentException != null && alt != null) {
+				// Reset exception
+				currentException = null;
+				try {
 					processPage(alt, includeTag, ctx, sw);
-				} else if (!ignoreError && !ctx.reportError(current, e)) {
-					throw e;
+				} catch (IOException e) {
+					currentException = e;
+				} catch (HttpErrorPage e) {
+					currentException = e;
 				}
 			}
+
+			// Handle onerror
+			if (currentException != null && !ignoreError && !ctx.reportError(current, currentException)) {
+				if (currentException instanceof IOException) {
+					throw (IOException) currentException;
+				} else if (currentException instanceof HttpErrorPage) {
+					throw (HttpErrorPage) currentException;
+				}
+				throw new IllegalStateException(
+						"This type of exception is unexpected here. Should be IOException or HttpErrorPageException.",
+						currentException);
+
+			}
+
 			// apply regexp replacements
 			String result = sw.toString();
 
@@ -171,9 +196,9 @@ class IncludeElement extends BaseElement {
 			} else {
 				EsiRenderer esiRenderer;
 				if (fragment != null)
-					esiRenderer = new EsiRenderer(page, fragment);
+					esiRenderer = new EsiRenderer(page, fragment, executor);
 				else
-					esiRenderer = new EsiRenderer();
+					esiRenderer = new EsiRenderer(executor);
 				if (fragmentReplacements != null && !fragmentReplacements.isEmpty())
 					esiRenderer.setFragmentsToReplace(fragmentReplacements);
 				rendererList.add(esiRenderer);
@@ -218,9 +243,20 @@ class IncludeElement extends BaseElement {
 		boolean ignoreError = "continue".equals(includeTag.getAttribute("onerror"));
 		FutureElement current = ctx.getCurrent();
 		// write accumulated data into parent
-		RunnableFuture result = new FutureTask<CharSequence>(new IncludeTask(includeTag, src, alt, ctx, current,
-				ignoreError, fragmentReplacements, regexpReplacements));
-		EsiExecutor.run(result);
+		Executor executor = (Executor) ctx.getData(EsiRenderer.DATA_EXECUTOR);
+		Future<CharSequence> result = null;
+		IncludeTask task = new IncludeTask(includeTag, src, alt, ctx, current, ignoreError, fragmentReplacements,
+				regexpReplacements, executor);
+		if (executor == null) {
+			// No threads.
+			CharSequence content = task.call();
+			result = new CharSequenceFuture(content);
+		} else {
+			// Start processing in a new thread.
+			RunnableFuture<CharSequence> r = new FutureTask<CharSequence>(task);
+			executor.execute(r);
+			result = r;
+		}
 		ctx.getCurrent().characters(result);
 	}
 

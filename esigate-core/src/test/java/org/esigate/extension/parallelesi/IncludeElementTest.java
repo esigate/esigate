@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Date;
 import java.util.Properties;
+import java.util.concurrent.Executors;
 
 import junit.framework.TestCase;
 
@@ -41,7 +42,7 @@ public class IncludeElementTest extends TestCase {
 		provider.addResource("http://www.foo.com/test", "test");
 		request = TestUtils.createRequest();
 		provider.initHttpRequestParams(request, null);
-		tested = new EsiRenderer();
+		tested = new EsiRenderer(Executors.newCachedThreadPool());
 	}
 
 	public void testIncludeProvider() throws IOException, HttpErrorPage {
@@ -133,28 +134,19 @@ public class IncludeElementTest extends TestCase {
 		assertEquals("before ---fetched inline cache item--- after", out.toString());
 	}
 
-	/**
-	 * This test is part of the ESI test suite, but the behavior is unspecified
-	 * with multi-threaded parsing.
-	 * <p>
-	 * We keep this test as a reminder
-	 * 
-	 * @throws IOException
-	 * @throws HttpErrorPage
-	 */
 	public void testIncludeInlineElement() throws IOException, HttpErrorPage {
+
+		// Inline caching behavior is unspecified if using multi-threading.
+		// Forcing single-thread processing.
+		EsiRenderer tested = tested = new EsiRenderer(null);
+
 		String page = "before <esi:include src='$(PROVIDER{mock})/inline-cache' /> middle "
 				+ "<esi:inline name='$(PROVIDER{mock})/inline-cache' fetchable='false'>---inline cache item---</esi:inline>"
 				+ "<esi:include src='$(PROVIDER{mock})/inline-cache' /> after";
 		provider.addResource("/inline-cache", "---fetched inline cache item---");
 		StringWriter out = new StringWriter();
 		tested.render(request, page, out);
-		// Behavior is unspecified : switch from success to failure due to
-		// timing issues.
-		// assertEquals("before ---fetched inline cache item--- middle ---inline cache item--- after",
-		// out.toString());
-		// assertEquals("before ---fetched inline cache item--- middle ---inline cache item--- after",
-		// out.toString());
+		assertEquals("before ---fetched inline cache item--- middle ---inline cache item--- after", out.toString());
 	}
 
 	public void testIncludeReplaceElementFragment() throws IOException, HttpErrorPage {
@@ -250,6 +242,47 @@ public class IncludeElementTest extends TestCase {
 		StringWriter out = new StringWriter();
 		tested.render(request, page, out);
 		assertEquals("before test after", out.toString());
+	}
+
+	/**
+	 * Test src + alt + onerror combined.
+	 * <p>
+	 * See 0000262: Unable to use both alt and onerror in esi:include
+	 * <p>
+	 * https://sourceforge.net/apps/mantisbt/webassembletool/view.php?id=262
+	 * <p>
+	 * See http://www.akamai.com/dl/technical_publications/esi_faq.pdf
+	 * <p>
+	 * What happens if the src and alt tags cannot be retrieved? If the edge
+	 * server can fetch neither the src object nor the alt object, it returns a
+	 * 404 HTTP error with a simple error message—unless the onerror attribute
+	 * is present. The onerror attribute can be used with an src only or with
+	 * both an src and alt attempt. If onerror=“continue” is specified and the
+	 * src and alt fail to fetch the object, ESI deletes the include tag and
+	 * serves the page without any object replacing the include statement.
+	 * <p>
+	 * When onerror=“continue” is set and the fetch fails, the edge server does
+	 * not serve a default object. Without the onerror attribute, the edge
+	 * server attempts to fetch a default object if one is specified in the
+	 * configuration file. The default object can be processed by ESI. However,
+	 * if anything goes wrong during ESI processing, the result is that the edge
+	 * server will send an error to the client. If you choose to use ESI in
+	 * default objects, the ESI code should be very simple and well-tested. For
+	 * more information on error handling, see “Exception and Error Handling” in
+	 * the ESI Developer’s Guide. For information on using onerror inside ESI’s
+	 * explicit exception handling method, see the try block documentation in
+	 * the same document.
+	 * 
+	 * @throws IOException
+	 * @throws HttpErrorPage
+	 */
+	public void testIncludeAltOnError() throws IOException, HttpErrorPage {
+		String page = "before "
+				+ "<esi:include src='$(PROVIDER{mock})/not-found' alt=\"$(PROVIDER{mock})/not-found2\"  onerror=\"continue\"/>"
+				+ " after";
+		StringWriter out = new StringWriter();
+		tested.render(request, page, out);
+		assertEquals("before  after", out.toString());
 	}
 
 	public void testOnError() throws IOException {
