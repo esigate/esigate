@@ -270,7 +270,7 @@ theme.mappings=/css/*, /images/*
 					<td>-</td>
 				</tr>
 				<tr>
-					<td>mapping</td>
+					<td>mappings</td>
 					<td>
 						Comma-separated list of URL patterns which are handled by this provider. Supported patterns are : 
 						<ul>
