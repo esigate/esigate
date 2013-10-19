@@ -93,8 +93,6 @@ public class ParallelAggregatorServlet extends HttpServlet {
 			Pair<Driver, UriMapping> dm = this.driverSelector.selectProvider(request);
 			String relUrl = RequestUrl.getRelativeUrl(request, dm.getRight());
 			LOG.debug("Proxying {}", relUrl);
-			// dm.getLeft().proxy(relUrl, mediator.getHttpRequest(), new
-			// AggregateRenderer(), new EsiRenderer());
 			dm.getLeft().proxy(relUrl, mediator.getHttpRequest(), new AggregateRenderer(),
 					new EsiRenderer(this.esiExecutor));
 		} catch (HttpErrorPage e) {
