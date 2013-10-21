@@ -75,6 +75,12 @@
 					<skip>true</skip> 
 				</configuration>
 			</plugin>
+			<plugin>
+				<artifactId>maven-emma-plugin</artifactId>
+				<configuration>
+					<skip>true</skip> 
+				</configuration>
+			</plugin>
 				<plugin>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<configuration>
