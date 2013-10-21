@@ -139,6 +139,9 @@ These dependencies are required : release pugin 2.4.1 depends on a previous vers
 <version>1.8.1</version>
 </dependency>
 </dependencies>
+<configuration>
+<arguments>-pl esigate-server,esigate-taglib,esigate-taglib-helper,esigate-jsf,esigate-wicket,esigate-cas,esigate-distribution -am</arguments>
+</configuration>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
