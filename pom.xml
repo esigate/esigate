@@ -12,7 +12,7 @@
 	<artifactId>esigate</artifactId>
 	<packaging>pom</packaging>
 	<name>esigate</name>
-	<version>4.3-SNAPSHOT</version>
+	<version>4.2-SNAPSHOT</version>
 	<inceptionYear>2008</inceptionYear>
 	<mailingLists>
 		<mailingList>
@@ -140,6 +140,7 @@ These dependencies are required : release pugin 2.4.1 depends on a previous vers
 </dependency>
 </dependencies>
 <configuration>
+<goals>install source:jar javadoc:jar deploy site:site site:deploy</goals>
 <arguments>-pl esigate-server,esigate-taglib,esigate-taglib-helper,esigate-jsf,esigate-wicket,esigate-cas,esigate-distribution -am</arguments>
 </configuration>
 				</plugin>
