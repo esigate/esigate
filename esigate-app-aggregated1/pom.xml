@@ -17,6 +17,18 @@
 					<skip>true</skip> 
 				</configuration>
 			</plugin>
+				<plugin>
+				<artifactId>maven-source-plugin</artifactId>
+				<configuration>
+					<skip>true</skip> 
+				</configuration>
+			</plugin>
+				<plugin>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<configuration>
+					<skip>true</skip> 
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-site-plugin</artifactId>
