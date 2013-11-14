@@ -56,10 +56,10 @@ public class HeaderManager {
 		// By default all headers are forwarded
 		requestHeadersFilterList.add(Collections.singletonList("*"));
 		responseHeadersFilterList.add(Collections.singletonList("*"));
-		PropertiesUtil.populate(requestHeadersFilterList, properties, Parameters.FORWARD_REQUEST_HEADERS.name, Parameters.DISCARD_REQUEST_HEADERS.name, "",
-				Parameters.DISCARD_REQUEST_HEADERS.defaultValue);
-		PropertiesUtil.populate(responseHeadersFilterList, properties, Parameters.FORWARD_RESPONSE_HEADERS.name, Parameters.DISCARD_RESPONSE_HEADERS.name, "",
-				Parameters.DISCARD_RESPONSE_HEADERS.defaultValue);
+		PropertiesUtil.populate(requestHeadersFilterList, properties, Parameters.FORWARD_REQUEST_HEADERS.name,
+				Parameters.DISCARD_REQUEST_HEADERS.name, "", Parameters.DISCARD_REQUEST_HEADERS.defaultValue);
+		PropertiesUtil.populate(responseHeadersFilterList, properties, Parameters.FORWARD_RESPONSE_HEADERS.name,
+				Parameters.DISCARD_RESPONSE_HEADERS.name, "", Parameters.DISCARD_RESPONSE_HEADERS.defaultValue);
 	}
 
 	protected boolean isForwardedRequestHeader(String headerName) {
@@ -76,10 +76,12 @@ public class HeaderManager {
 		for (Header header : originalRequest.getAllHeaders()) {
 			// Special headers
 			// User-agent must be set in a specific way
-			if (HttpHeaders.USER_AGENT.equalsIgnoreCase(header.getName()) && isForwardedRequestHeader(HttpHeaders.USER_AGENT))
+			if (HttpHeaders.USER_AGENT.equalsIgnoreCase(header.getName())
+					&& isForwardedRequestHeader(HttpHeaders.USER_AGENT))
 				httpRequest.getParams().setParameter(CoreProtocolPNames.USER_AGENT, header.getValue());
 			// Referer must be rewritten
-			else if (HttpHeaders.REFERER.equalsIgnoreCase(header.getName()) && isForwardedRequestHeader(HttpHeaders.REFERER)) {
+			else if (HttpHeaders.REFERER.equalsIgnoreCase(header.getName())
+					&& isForwardedRequestHeader(HttpHeaders.REFERER)) {
 				String value = header.getValue();
 				try {
 					value = UriUtils.translateUrl(value, originalUri, uri);
@@ -94,12 +96,29 @@ public class HeaderManager {
 		}
 		// process X-Forwarded-For header (is missing in request and not
 		// blacklisted) -> use remote address instead
-		String remoteAddr = HttpRequestHelper.getMediator(originalRequest).getRemoteAddr();
-		if (HttpRequestHelper.getFirstHeader("X-Forwarded-For", originalRequest) == null && isForwardedRequestHeader("X-Forwarded-For") && remoteAddr != null) {
-			httpRequest.addHeader("X-Forwarded-For", remoteAddr);
+		if (isForwardedRequestHeader("X-Forwarded-For")) {
+			String remoteAddr = HttpRequestHelper.getMediator(originalRequest).getRemoteAddr();
+
+			if (remoteAddr != null) {
+				String forwardedFor = HttpRequestHelper.getFirstHeader("X-Forwarded-For", originalRequest);
+
+				if (forwardedFor == null) {
+					forwardedFor = remoteAddr;
+				} else {
+					forwardedFor = forwardedFor + ", " + remoteAddr;
+				}
+
+				httpRequest.setHeader("X-Forwarded-For", forwardedFor);
+			}
 		}
-		// add X-Forwarded-Proto header
-		httpRequest.addHeader("X-Forwarded-Proto", UriUtils.extractScheme(originalRequest.getRequestLine().getUri()));
+
+		if (isForwardedRequestHeader("X-Forwarded-Proto")) {
+			if (HttpRequestHelper.getFirstHeader("X-Forwarded-Proto", originalRequest) == null) {
+				// add X-Forwarded-Proto header
+				httpRequest.addHeader("X-Forwarded-Proto",
+						UriUtils.extractScheme(originalRequest.getRequestLine().getUri()));
+			}
+		}
 	}
 
 	/**
@@ -111,7 +130,8 @@ public class HeaderManager {
 	 * @param output
 	 * @throws MalformedURLException
 	 */
-	public void copyHeaders(HttpRequest httpRequest, HttpEntityEnclosingRequest originalRequest, HttpResponse httpClientResponse, HttpResponse output) throws MalformedURLException {
+	public void copyHeaders(HttpRequest httpRequest, HttpEntityEnclosingRequest originalRequest,
+			HttpResponse httpClientResponse, HttpResponse output) throws MalformedURLException {
 		String originalUri = originalRequest.getRequestLine().getUri();
 		String uri = httpRequest.getRequestLine().getUri();
 		for (Header header : httpClientResponse.getAllHeaders()) {
@@ -124,7 +144,8 @@ public class HeaderManager {
 				if (!HttpHeaders.CONTENT_ENCODING.equalsIgnoreCase(name)) {
 					if (isForwardedResponseHeader(name)) {
 						// Some headers containing an URI have to be rewritten
-						if (HttpHeaders.LOCATION.equalsIgnoreCase(name) || HttpHeaders.CONTENT_LOCATION.equalsIgnoreCase(name)) {
+						if (HttpHeaders.LOCATION.equalsIgnoreCase(name)
+								|| HttpHeaders.CONTENT_LOCATION.equalsIgnoreCase(name)) {
 							// Header contains only an url
 							value = UriUtils.translateUrl(value, uri, originalUri);
 							value = HttpResponseUtils.removeSessionId(value, httpClientResponse);
