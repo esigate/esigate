@@ -110,6 +110,41 @@ public class XForwardedHeadersTest extends AbstractDriverTestCase {
 	}
 
 	/**
+	 * Discard existing headers and ensure they are correctly replaced by
+	 * default ones.
+	 * 
+	 * @throws Exception
+	 *             on error
+	 */
+	public void testXForwardedHeadersDiscarded() throws Exception {
+		Properties properties = new Properties();
+		properties.put(Parameters.REMOTE_URL_BASE.name, "http://localhost/");
+		properties.put(Parameters.DISCARD_REQUEST_HEADERS, "X-Forwarded-For,X-Forwarded-Proto");
+
+		Driver driver = createMockDriver(properties, new HttpRequestExecutor() {
+			@Override
+			public HttpResponse execute(HttpRequest request, HttpClientConnection conn, HttpContext context)
+					throws IOException, HttpException {
+				assertEquals(1, request.getHeaders("X-Forwarded-For").length);
+				assertEquals("127.0.0.1", request.getFirstHeader("X-Forwarded-For").getValue());
+				assertEquals(1, request.getHeaders("X-Forwarded-Proto").length);
+				assertEquals("http", request.getFirstHeader("X-Forwarded-Proto").getValue());
+				return createHttpResponse().status(HttpStatus.SC_OK).reason("OK").build();
+			}
+		});
+
+		String uri = "http://test.mydomain.fr/foobar/";
+		MockMediator mediator = new MockMediator(uri);
+		mediator.setRemoteAddr("127.0.0.1");
+
+		HttpEntityEnclosingRequest request = createHttpRequest().uri(uri).header("X-Forwarded-For", "192.168.0.1")
+				.header("X-Forwarded-Proto", "https").mediator(mediator).build();
+
+		driverProxy(driver, request);
+
+	}
+
+	/**
 	 * Ensure X-Forwarded headers are correctly added.
 	 * <ul>
 	 * <li>Ensure X-Forwarded-For is set to 127.0.0.1</li>
