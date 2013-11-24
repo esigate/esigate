@@ -41,19 +41,31 @@ var users = [{
 		   "title": "voyages-sncf.com",
 		   "url": "http://www.voyages-sncf.com",
 		   "weight": Math.random()
-
 	}, {
 		"img": "ag2r.png",
 		   "title": "AG2R La mondiale",
 		   "url": "http://www.ag2rlamondiale.fr",
 		   "weight": Math.random()
-		   
+	}, {
+		"img": "manitou.png",
+		   "title": "Manitou Group",
+		   "url": "http://www.manitou-group.fr",
+		   "weight": Math.random()
 	}, {
 		"img": "nantes-metropole.png",
-		   "title": "Nantes Métropole",
+		   "title": "Nantes MÃ©tropole",
 		   "url": "http://www.nantesmetropole.fr",
 		   "weight": Math.random()
-		   
+	}, {
+		"img": "systalians.png",
+		   "title": "Systalians",
+		   "url": "http://www.systalians.com",
+		   "weight": Math.random()
+	}, {
+		"img": "reunica.png",
+		   "title": "Reunica",
+		   "url": "http://www.reunica.com",
+		   "weight": Math.random()
 	}];
 
 users.sort(function(a,b) { return parseFloat(a.weight) - parseFloat(b.weight) } );
