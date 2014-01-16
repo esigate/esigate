@@ -263,4 +263,27 @@ public class ResourceFixupRendererTest extends TestCase {
 		assertEquals(expectedOutputAbsolute, out.toString());
 	}
 
+	/**
+	 * Test for 0000286: ResourceFixupRenderer StringIndexOutOfBoundsException
+	 * <p>
+	 * Index out of range if page paramter is empty.
+	 * 
+	 * @throws IOException
+	 */
+	public void testBug286() throws IOException {
+		String base = "https://myapplication";
+		String page = "";
+		final String input = "<html></html>";
+
+		// Relative test
+		Writer out = new StringWriter();
+		ResourceFixupRenderer tested = new ResourceFixupRenderer(base, base, page, ResourceFixupRenderer.RELATIVE);
+		tested.render(null, input, out);
+
+		// Absolute test
+		out = new StringWriter();
+		tested = new ResourceFixupRenderer(base, base, page, ResourceFixupRenderer.ABSOLUTE);
+		tested.render(null, input, out);
+	}
+
 }

@@ -15,6 +15,8 @@
 
 package org.esigate.renderers;
 
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+
 import java.io.IOException;
 import java.io.Writer;
 import java.net.URI;
@@ -31,8 +33,10 @@ import org.slf4j.LoggerFactory;
  * This renderer "fixes" links to resources, images and pages in pages retrieved
  * by esigate :
  * <ul>
- * <li>Current-path-relative urls are converted to full path relative urls (  img/test.img -> /myapp/curentpath/img/test.img)</li>
- * <li>All relative urls can be converted to absolute urls (including server name)</li>
+ * <li>Current-path-relative urls are converted to full path relative urls (
+ * img/test.img -> /myapp/curentpath/img/test.img)</li>
+ * <li>All relative urls can be converted to absolute urls (including server
+ * name)</li>
  * </ul>
  * 
  * This enables use of esigate without any special modifications of the
@@ -149,7 +153,7 @@ public class ResourceFixupRenderer implements Renderer {
 		cleanBaseUrl = removeLeadingSlash(cleanBaseUrl);
 
 		String cleanPageFullPath = pageFullPath;
-		if (cleanPageFullPath.charAt(0) == SLASH) {
+		if (isNotEmpty(cleanPageFullPath) && cleanPageFullPath.charAt(0) == SLASH) {
 			cleanPageFullPath = cleanPageFullPath.substring(1);
 		}
 
