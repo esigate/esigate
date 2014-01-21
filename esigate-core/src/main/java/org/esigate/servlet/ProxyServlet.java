@@ -27,6 +27,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.esigate.Driver;
 import org.esigate.DriverFactory;
 import org.esigate.HttpErrorPage;
+import org.esigate.aggregator.AggregateRenderer;
+import org.esigate.esi.EsiRenderer;
 import org.esigate.impl.UriMapping;
 import org.esigate.servlet.impl.DriverSelector;
 import org.esigate.servlet.impl.RequestUrl;
@@ -72,7 +74,7 @@ public class ProxyServlet extends HttpServlet {
 			Pair<Driver, UriMapping> dm = this.driverSelector.selectProvider(request);
 			String relUrl = RequestUrl.getRelativeUrl(request, dm.getRight());
 			LOG.debug("Proxying {}", relUrl);
-			dm.getLeft().proxy(relUrl, mediator.getHttpRequest());
+			dm.getLeft().proxy(relUrl, mediator.getHttpRequest(), new AggregateRenderer(), new EsiRenderer());
 		} catch (HttpErrorPage e) {
 			mediator.sendResponse(e.getHttpResponse());
 		}
