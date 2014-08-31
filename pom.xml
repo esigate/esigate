@@ -276,7 +276,7 @@ These dependencies are required : release pugin 2.4.1 depends on a previous vers
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-site-plugin</artifactId>
-				<version>3.2</version>
+				<version>3.4</version>
 				<configuration>
 					<chmod>true</chmod>
 					<chmodMode>g+wX,a+rX</chmodMode>
@@ -673,7 +673,7 @@ These dependencies are required : release pugin 2.4.1 depends on a previous vers
 			<!-- <url>sftp://web.sourceforge.net/home/groups/w/we/webassembletool/htdocs</url> -->
 			<!-- To use scp, you need to create a shell first : ssh -t USER,webassembletool@shell.sourceforge.net 
 				create -->
-			<url>scp://shell.sourceforge.net/home/project-web/webassembletool/htdocs</url>
+			<url>scp://shell.sourceforge.net/home/project-web/webassembletool/htdocs/${project.version}</url>
 		</site>
 		<snapshotRepository>
 			<id>sonatype-nexus-snapshots</id>
