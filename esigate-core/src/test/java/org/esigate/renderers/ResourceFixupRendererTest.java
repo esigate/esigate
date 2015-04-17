@@ -285,5 +285,30 @@ public class ResourceFixupRendererTest extends TestCase {
 		tested = new ResourceFixupRenderer(base, base, page, ResourceFixupRenderer.ABSOLUTE);
 		tested.render(null, input, out);
 	}
+	
+	/**
+	 * Test for bug with ResourceFixupRenderer with mailto
+	 * 	 
+	 */
+	public void testBugMailTo() throws IOException {
+		String base = "http://localhost:8084/applicationPath/";
+		String visible = "http://localhost:8084/";
+		String page = "/";
+		final String input = "<A HREF=\"mailto:san@antonio.net\">san@antonio.net</A>";
+		final String expectedOutputRelative = "<A HREF=\"mailto:san@antonio.net\">san@antonio.net</A>";
+		final String expectedOutputAbsolute = "<A HREF=\"mailto:san@antonio.net\">san@antonio.net</A>";
+
+		// Relative test
+		Writer out = new StringWriter();
+		ResourceFixupRenderer tested = new ResourceFixupRenderer(base, visible, page, ResourceFixupRenderer.RELATIVE);
+		tested.render(null, input, out);
+		assertEquals(expectedOutputRelative, out.toString());
+
+		// Absolute test
+		out = new StringWriter();
+		tested = new ResourceFixupRenderer(base, visible, page, ResourceFixupRenderer.ABSOLUTE);
+		tested.render(null, input, out);
+		assertEquals(expectedOutputAbsolute, out.toString());
+	}
 
 }
