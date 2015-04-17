@@ -218,7 +218,7 @@ public class ResourceFixupRenderer implements Renderer {
 
 		// Keep absolute, protocol-absolute and javascript urls untouched.
 		if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("//") || url.startsWith("#")
-				|| url.startsWith("javascript:")) {
+				|| url.startsWith("javascript:") || url.startsWith("mailto:")) {
 			LOG.debug("keeping absolute url: {}", url);
 			return url;
 		}
