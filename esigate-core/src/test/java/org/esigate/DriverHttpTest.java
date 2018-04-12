@@ -27,6 +27,7 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.esigate.extension.Esi;
+import org.esigate.extension.FetchLogging;
 import org.esigate.http.IncomingRequest;
 import org.esigate.http.RetryExtension;
 import org.esigate.test.PropertiesBuilder;
@@ -59,7 +60,7 @@ public class DriverHttpTest extends TestCase {
         Properties properties = new PropertiesBuilder()//
                 .set(Parameters.REMOTE_URL_BASE, "http://localhost:9999/") //
                 // Enable retry
-                .set(Parameters.EXTENSIONS, Esi.class, RetryExtension.class) //
+                .set(Parameters.EXTENSIONS, Esi.class, RetryExtension.class, FetchLogging.class) //
                 .set(Parameters.MAX_CONNECTIONS_PER_HOST, 200) //
                 .build();
 
@@ -104,4 +105,5 @@ public class DriverHttpTest extends TestCase {
 
         server.stop();
     }
+
 }
