@@ -86,30 +86,32 @@ public class ProxyingHttpClientBuilder extends CachingHttpClientBuilder {
 
             @Override
             public CloseableHttpResponse execute(HttpRoute route, HttpRequestWrapper request,
-                    HttpClientContext httpClientContext, HttpExecutionAware execAware) {
+                    HttpClientContext httpClientContext, HttpExecutionAware execAware) throws IOException,
+                    HttpException {
                 OutgoingRequestContext context = OutgoingRequestContext.adapt(httpClientContext);
                 // Create request event
                 FetchEvent fetchEvent = new FetchEvent(context, request);
 
                 eventManager.fire(EventManager.EVENT_FETCH_PRE, fetchEvent);
 
-                if (fetchEvent.isExit()) {
-                    if (fetchEvent.getHttpResponse() == null) {
-                        // Provide an error page in order to avoid a NullPointerException
-                        fetchEvent.setHttpResponse(HttpErrorPage.generateHttpResponse(
-                                HttpStatus.SC_INTERNAL_SERVER_ERROR,
-                                "An extension stopped the processing of the request without providing a response"));
-                    }
-                } else {
-                    try {
+                try {
+                    if (fetchEvent.isExit()) {
+                        if (fetchEvent.getHttpResponse() == null) {
+                            // Provide an error page in order to avoid a NullPointerException
+                            fetchEvent.setHttpResponse(HttpErrorPage.generateHttpResponse(
+                                    HttpStatus.SC_INTERNAL_SERVER_ERROR,
+                                    "An extension stopped the processing of the request without providing a response"));
+                        }
+                    } else {
                         fetchEvent.setHttpResponse(wrapped.execute(route, request, context, execAware));
-                    } catch (IOException | HttpException e) {
-                        fetchEvent.setHttpResponse(HttpErrorPage.generateHttpResponse(e));
                     }
+                } catch (IOException | HttpException e) {
+                    fetchEvent.setHttpResponse(HttpErrorPage.generateHttpResponse(e));
+                    throw e;
+                } finally {
+                    // Update the event and fire post event
+                    eventManager.fire(EventManager.EVENT_FETCH_POST, fetchEvent);
                 }
-
-                // Update the event and fire post event
-                eventManager.fire(EventManager.EVENT_FETCH_POST, fetchEvent);
 
                 return fetchEvent.getHttpResponse();
             }
