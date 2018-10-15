@@ -28,6 +28,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.XMLConstants;
 
 import nu.validator.htmlparser.common.DoctypeExpectation;
 import nu.validator.htmlparser.dom.Dom2Sax;
@@ -87,6 +88,7 @@ public class XsltRenderer implements Renderer {
     }
 
     private static Transformer createTransformer(InputStream templateStream) throws IOException {
+        TRANSFORMER_FACTORY.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
         try {
             return TRANSFORMER_FACTORY.newTransformer(new StreamSource(templateStream));
         } catch (TransformerConfigurationException e) {
