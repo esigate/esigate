@@ -88,8 +88,8 @@ public class XsltRenderer implements Renderer {
     }
 
     private static Transformer createTransformer(InputStream templateStream) throws IOException {
-        TRANSFORMER_FACTORY.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
         try {
+            TRANSFORMER_FACTORY.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
             return TRANSFORMER_FACTORY.newTransformer(new StreamSource(templateStream));
         } catch (TransformerConfigurationException e) {
             throw new ProcessingFailedException("Failed to create XSLT template", e);
