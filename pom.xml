@@ -345,6 +345,16 @@
 				<enabled>true</enabled>
 			</snapshots>
 		</repository>
+		<repository>
+			<id>spring-plugins</id>
+			<url>http://repo.spring.io/plugins-release</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
 	</repositories>
 	<reporting>
 		<plugins>
