@@ -638,13 +638,13 @@
 			<dependency>
 				<groupId>org.jasig.cas</groupId>
 				<artifactId>cas-server-webapp</artifactId>
-				<version>3.3.1</version>
+				<version>3.3.5</version>
 				<type>war</type>
 			</dependency>
 			<dependency>
 				<groupId>org.jasig.cas</groupId>
 				<artifactId>cas-server-core</artifactId>
-				<version>3.3.1</version>
+				<version>3.3.5</version>
 				<type>jar</type>
 			</dependency>
 			<dependency>
