@@ -345,6 +345,16 @@
 				<enabled>true</enabled>
 			</snapshots>
 		</repository>
+		<repository>
+			<id>spring-plugins</id>
+			<url>http://repo.spring.io/plugins-release</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
 	</repositories>
 	<reporting>
 		<plugins>
@@ -578,7 +588,7 @@
 			<dependency>
 				<groupId>org.jasig.cas.client</groupId>
 				<artifactId>cas-client-core</artifactId>
-				<version>3.4.1</version>
+				<version>3.5.0</version>
 				<scope>compile</scope>
 				<exclusions>
 					<!-- In order to avoid infinite loops between slf4j and log4j as we 
@@ -638,13 +648,13 @@
 			<dependency>
 				<groupId>org.jasig.cas</groupId>
 				<artifactId>cas-server-webapp</artifactId>
-				<version>3.3.1</version>
+				<version>3.6.0</version>
 				<type>war</type>
 			</dependency>
 			<dependency>
 				<groupId>org.jasig.cas</groupId>
 				<artifactId>cas-server-core</artifactId>
-				<version>3.3.1</version>
+				<version>3.6.0</version>
 				<type>jar</type>
 			</dependency>
 			<dependency>
