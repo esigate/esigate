@@ -72,6 +72,7 @@ public final class EsigateServer {
     private static final int PROPERTY_DEFAULT_HTTP_PORT = 8080;
     private static final String PROPERTY_PREFIX = "server.";
     private static Server srv = null;
+    private static boolean joined = false;
 
     private EsigateServer() {
 
@@ -298,7 +299,7 @@ public final class EsigateServer {
             srv.setHandler(handlers);
             srv.start();
             srv.join();
-
+            joined = true;
         }
 
     }
@@ -309,7 +310,7 @@ public final class EsigateServer {
      * @return true if started.
      */
     public static boolean isStarted() {
-        return srv != null && srv.isStarted();
+        return srv != null && srv.isStarted() && joined;
     }
 
     /**
