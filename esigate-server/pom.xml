@@ -35,9 +35,9 @@
 			<artifactId>commons-io</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.codahale.metrics</groupId>
+			<groupId>io.dropwizard.metrics</groupId>
 			<artifactId>metrics-jetty9</artifactId>
-			<version>3.0.1</version>
+			<version>4.0.3</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -75,7 +75,7 @@
 			<plugin>
 				<groupId>org.eclipse.jetty</groupId>
 				<artifactId>jetty-maven-plugin</artifactId>
-				<version>9.2.2.v20140723</version>
+				<version>9.4.12.v20180830</version>
 				<configuration>
 					<scanIntervalSeconds>10</scanIntervalSeconds>
 					<webApp>
@@ -130,7 +130,7 @@
 		</dependencies>
 	</dependencyManagement>
 	<properties>
-		<jetty.version>9.1.2.v20140210</jetty.version>
+		<jetty.version>9.4.12.v20180830</jetty.version>
 	</properties>
 	<reporting>
 		<plugins>
