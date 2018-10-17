@@ -45,7 +45,6 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-
 /**
  * Applies an XSLT transformation to the retrieved data.
  * 

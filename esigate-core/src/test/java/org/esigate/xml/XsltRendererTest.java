@@ -60,26 +60,28 @@ public class XsltRendererTest {
         return out.toString();
     }
 
-	private String renderExtensionStyleSheet(String src) throws IOException {
-		String template = "<?xml version=\"1.0\"?>";
-		template += "<xsl:stylesheet version=\"1.0\" xmlns=\"http://www.w3.org/1999/xhtml\" "
-				+ "xmlns:html=\"http://www.w3.org/1999/xhtml\" "
-				+ "xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\">";
-		template += "<xsl:output method=\"xml\" omit-xml-declaration=\"yes\"/>";
-		template += "<xsl:template match=\"/\"  xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" xmlns:rt=\"http://xml.apache.org/xalan/java/java.lang.Runtime\">";
+    private String renderExtensionStyleSheet(String src) throws IOException {
+        String template = "<?xml version=\"1.0\"?>";
+        template +=
+                "<xsl:stylesheet version=\"1.0\" xmlns=\"http://www.w3.org/1999/xhtml\" "
+                        + "xmlns:html=\"http://www.w3.org/1999/xhtml\" "
+                        + "xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\">";
+        template += "<xsl:output method=\"xml\" omit-xml-declaration=\"yes\"/>";
+        template +=
+                "<xsl:template match=\"/\"  xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" xmlns:rt=\"http://xml.apache.org/xalan/java/java.lang.Runtime\">";
 
-		template += "<xsl:variable name=\"rtObj\" select=\"rt:getRuntime()\"/>";
-		template += "<xsl:variable name=\"process\" select=\"rt:totalMemory($rtObj)\"/>";
-		template += "Process: <xsl:value-of select=\"$process\"/>\n";
+        template += "<xsl:variable name=\"rtObj\" select=\"rt:getRuntime()\"/>";
+        template += "<xsl:variable name=\"process\" select=\"rt:totalMemory($rtObj)\"/>";
+        template += "Process: <xsl:value-of select=\"$process\"/>\n";
 
-		template += "</xsl:template>";
+        template += "</xsl:template>";
 
-		template += "</xsl:stylesheet>";
-		StringBuilderWriter out = new StringBuilderWriter();
-		XsltRenderer tested = new XsltRenderer(template);
-		tested.render(null, src, out);
-		return out.toString();
-	}
+        template += "</xsl:stylesheet>";
+        StringBuilderWriter out = new StringBuilderWriter();
+        XsltRenderer tested = new XsltRenderer(template);
+        tested.render(null, src, out);
+        return out.toString();
+    }
 
     /**
      * Tests parser does not throw an Exception for an unescaped '&' character.
