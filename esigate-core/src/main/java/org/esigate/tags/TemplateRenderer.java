@@ -31,10 +31,10 @@ import org.slf4j.LoggerFactory;
  * Template renderer.
  * <p>
  * Retrieves a template from the provider application and renders it to the writer replacing the parameters with the
- * given map. If <code>name</code> param is <code>null</code>, the whole page will be used as the template.<br />
+ * given map. If <code>name</code> param is <code>null</code>, the whole page will be used as the template.<br>
  * eg: The template <code>mytemplate</code> can be delimited in the provider page by comments
- * <code>&lt;!--$begintemplate$mytemplate$--&gt;</code> and <code>&lt;!--$endtemplate$mytemplate$--&gt;</code>.<br />
- * Inside the template, the parameters can be defined by comments.<br />
+ * <code>&lt;!--$begintemplate$mytemplate$--&gt;</code> and <code>&lt;!--$endtemplate$mytemplate$--&gt;</code>.<br>
+ * Inside the template, the parameters can be defined by comments.<br>
  * eg: parameter named <code>myparam</code> should be delimited by comments
  * <code>&lt;!--$beginparam$myparam$--&gt;</code> and <code>&lt;!--$endparam$myparam$--&gt;</code>
  * 

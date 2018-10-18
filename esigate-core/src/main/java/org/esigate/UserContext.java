@@ -22,7 +22,7 @@ import org.esigate.http.IncomingRequest;
 
 /**
  * User context that can be used in the master application to define the user id. This context will be transmitted to
- * the provider applications.<br />
+ * the provider applications.<br>
  * There is one instance of user context associated with each session.
  * 
  * @author Francois-Xavier Bonnet

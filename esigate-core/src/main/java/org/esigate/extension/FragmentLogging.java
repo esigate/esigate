@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Log level is :
  * <ul>
- * <li>WARN for status codes >= 400</li>
+ * <li>WARN for status codes &gt;= 400</li>
  * <li>INFO for other codes</li>
  * </ul>
  * <p>

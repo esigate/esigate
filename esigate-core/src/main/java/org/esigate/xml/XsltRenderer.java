@@ -48,7 +48,7 @@ import org.xml.sax.SAXException;
 /**
  * Applies an XSLT transformation to the retrieved data.
  * 
- * If no namespace is specified in the document to transform, it is asumed as:<br />
+ * If no namespace is specified in the document to transform, it is asumed as:<br>
  * xmlns="http://www.w3.org/1999/xhtml"
  * 
  * @author Stanislav Bernatskyi

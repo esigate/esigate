@@ -20,8 +20,6 @@ import java.util.Date;
 import java.util.Properties;
 import java.util.zip.GZIPOutputStream;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.io.output.NullOutputStream;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -39,11 +37,12 @@ import org.esigate.Parameters;
 import org.esigate.cache.EhcacheCacheStorage;
 import org.esigate.cookie.CookieManager;
 import org.esigate.extension.ExtensionFactory;
-import org.esigate.extension.parallelesi.Esi;
 import org.esigate.impl.DriverRequest;
 import org.esigate.test.PropertiesBuilder;
 import org.esigate.test.TestUtils;
 import org.esigate.test.conn.MockConnectionManager;
+
+import junit.framework.TestCase;
 
 /**
  * DriverConfiguration test case.

@@ -103,7 +103,7 @@ public class EsiRenderer implements Renderer, FutureAppendable {
     }
 
     /**
-     * Constructor used to render a fragment Retrieves a fragment inside a page.<br />
+     * Constructor used to render a fragment Retrieves a fragment inside a page.<br>
      * 
      * Extracts html between <code>&lt;esi:fragment name="myFragment"&gt;</code> and <code>&lt;/esi:fragment&gt;</code>
      * 

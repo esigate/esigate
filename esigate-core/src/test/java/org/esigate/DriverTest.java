@@ -14,16 +14,17 @@
 
 package org.esigate;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.SocketTimeoutException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.GZIPOutputStream;
-
-import junit.framework.Assert;
-import junit.framework.TestCase;
 
 import org.apache.http.HttpClientConnection;
 import org.apache.http.HttpEntity;
@@ -50,8 +51,6 @@ import org.esigate.events.EventManager;
 import org.esigate.events.IEventListener;
 import org.esigate.events.impl.FetchEvent;
 import org.esigate.extension.DefaultCharset;
-import org.esigate.extension.FetchLogging;
-import org.esigate.extension.parallelesi.Esi;
 import org.esigate.http.DateUtils;
 import org.esigate.http.HttpClientRequestExecutor;
 import org.esigate.http.HttpResponseUtils;
@@ -65,6 +64,9 @@ import org.esigate.test.conn.IResponseHandler2;
 import org.esigate.test.conn.MockConnectionManager;
 import org.esigate.test.http.HttpResponseBuilder;
 import org.esigate.util.UriUtils;
+
+import junit.framework.Assert;
+import junit.framework.TestCase;
 
 public class DriverTest extends TestCase {
     private IncomingRequest.Builder request;
