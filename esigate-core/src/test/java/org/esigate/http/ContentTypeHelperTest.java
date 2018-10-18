@@ -56,7 +56,7 @@ public class ContentTypeHelperTest extends TestCase {
         ContentTypeHelper contentTypeHelper = new ContentTypeHelper(properties);
         assertParsableContentType(contentTypeHelper, "text/plain");
 
-       properties = new PropertiesBuilder() //
+        properties = new PropertiesBuilder() //
                 .set(Parameters.REMOTE_URL_BASE, "http://localhost") //
                 .set(Parameters.PARSABLE_CONTENT_TYPES, "text/plain, text/html") //
                 .build();
