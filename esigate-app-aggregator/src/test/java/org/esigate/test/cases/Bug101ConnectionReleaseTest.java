@@ -51,7 +51,8 @@ public class Bug101ConnectionReleaseTest {
 
         Driver driver = Driver.builder().setName("test").setProperties(properties).build();
 
-        // First call / do not measure first request which can be slow
+        // 2 first calls / do not measure first requests which can be slow
+        render(driver, "utf8.jsp");
         render(driver, "utf8.jsp");
 
         long start = System.currentTimeMillis();
