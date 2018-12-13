@@ -12,7 +12,7 @@
 		<section name="Security bulletins">
 
 <ul>
-<li><a href="security/security-01.html">CVE XXX - Remote Code Execution on XSLT processing</a></li>
+<li><a href="security/security-01.html">CVE-2018-1000854 - Remote Code Execution on XSLT processing</a></li>
 </ul>
 			
 			
