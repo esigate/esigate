@@ -58,6 +58,7 @@
 			<item href="reference.html" name="Reference documentation" />
 			<item href="external-resources.html" name="External resources" />
 			<item href="upgrade.html" name="Upgrade" />
+			<item href="security.html" name="Security bulletins" />
 		</menu>
 
 		<menu ref="reports" />

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+	<properties>
+		<title>CVEXXX - Remote Code Execution on XSLT processing</title>
+		<author email="nicolas.richeton@gmail.com">Nicolas Richeton</author>
+	</properties>
+	<body>
+		
+
+		<section name="CVEXXX - Remote Code Execution on XSLT processing">
+
+			<subsection name="Summary">
+				<p>
+					An attacker can execute code on an esigate instance by injecting a malicious XSLT stylesheet in a backend/provider application. This requires control of the backend/provider 
+				</p>
+				<table>
+				<tr><th>Who should read this</th><td>All esigate admins</td></tr>
+				<tr><th>Impact of vulnerability</th><td>Possible Remote Code Execution when an attacker has control of backend/provider application (direct or using another vulnerability in these applications) .</td></tr>
+				<tr><th>Maximum security rating</th><td>Critical</td></tr>
+				<tr><th>Recommendation</th><td>Upgrade to esigate 5.3</td></tr>
+				<tr><th>Affected Software</th><td>Esigate 5.2 and lower.</td></tr>
+				<tr><th>Reporter</th><td>This bug was found by Benoit Côté-Jodoin from GoSecure.</td></tr>
+				<tr><th>CVE Identifier</th><td>To be assigned </td></tr>
+				</table>
+			</subsection>
+			<subsection name="Problem">
+				<p>
+					ESIGate supports &lt;esi:include&gt; tag along with the stylesheet attribute. This attribute can be a remote XSLT. This feature can allow an attacker to execute code on the remote server.
+
+The attack scenario requires the attacker to reflect a  &lt;esi:include&gt; tag in any page (Any XSS-like injection point). From this injection point, the include tag will point to any page and to a remote malicious stylesheet.
+				</p>
+				
+			</subsection>
+			<subsection name="Solution">
+				<p>
+					Update to esigate 5.3. </p>
+					<p>
+XSLT processing has been switched to secure mode, preventing advanced extensions to be used. Esigate will display an error is a malicious XSLT stylesheet is used.
+				</p>
+				
+			</subsection>
+
+			<subsection name="Compatibility">
+				<p>
+					No backward compatibility issue is expected 
+
+				</p>
+
+			</subsection>
+			<subsection name="Workaround">
+				<p>
+					No workaround exists other than ensuring that attacker cannot inject html tags into backend/provider application.
+				</p>
+
+			</subsection>
+		
+
+			<div id="disqus_thread"></div>
+			<script type="text/javascript">
+<![CDATA[  
+        var disqus_shortname = 'esigate';
+
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+        
+      //  ]]>
+			</script>
+			<noscript>
+				Please enable JavaScript to view the
+				<a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+			</noscript>
+			<a href="http://disqus.com" class="dsq-brlink">
+				comments powered by
+				<span class="logo-disqus">Disqus</span>
+			</a>
+
+		</section>
+	</body>
+</document>

@@ -27,7 +27,7 @@ import org.esigate.impl.UrlRewriter;
 /**
  * This renderer "fixes" links to resources, images and pages in pages retrieved by esigate :
  * <ul>
- * <li>Current-path-relative urls are converted to full path relative urls ( img/test.img ->
+ * <li>Current-path-relative urls are converted to full path relative urls ( img/test.img -&gt;
  * /myapp/curentpath/img/test.img)</li>
  * <li>All relative urls can be converted to absolute urls (including server name)</li>
  * </ul>

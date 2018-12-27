@@ -66,7 +66,7 @@ public final class HttpResponseUtils {
      * 
      * @param httpResponse
      *            tge {@link HttpResponse}
-     * @return true if status code >= 400
+     * @return true if status code &gt;= 400
      */
     public static boolean isError(HttpResponse httpResponse) {
         return httpResponse.getStatusLine().getStatusCode() >= HttpStatus.SC_BAD_REQUEST;

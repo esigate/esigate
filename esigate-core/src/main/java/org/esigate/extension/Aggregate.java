@@ -17,8 +17,8 @@ import org.esigate.extension.surrogate.Surrogate;
 /**
  * This extension processes the old esigate directives based on html comments, like :
  * <p>
- * &lt;!--$includeblock$aggregated2$block.html$myblock$-->
- * </p>
+ * &lt;!--$includeblock$aggregated2$block.html$myblock$--&gt;
+ * <p>
  * see : http://www.esigate.org/html-comments.html for complete syntax.
  * 
  * @author Nicolas Richeton
