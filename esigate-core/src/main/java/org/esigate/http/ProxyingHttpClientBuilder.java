@@ -107,11 +107,11 @@ public class ProxyingHttpClientBuilder extends CachingHttpClientBuilder {
                         eventManager.fire(EventManager.EVENT_FETCH_POST, fetchEvent);
                     } catch (IOException | HttpException e) {
                         fetchEvent.setHttpResponse(HttpErrorPage.generateHttpResponse(e));
-                        fetchEvent.setExit(true); // Usually we want to render the exception but we let an extension
-                                                  // decide
+                        // Usually we want to render and cache the exception but we let an extension decide
+                        fetchEvent.setExit(true);
                         eventManager.fire(EventManager.EVENT_FETCH_POST, fetchEvent);
                         if (!fetchEvent.isExit())
-                            throw e; // Throw the exception and let http client process it
+                            throw e; // Throw the exception and let http client process it (may retry)
                     }
                 }
 

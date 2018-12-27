@@ -15,6 +15,7 @@
 package org.esigate;
 
 import java.io.IOException;
+import java.net.ServerSocket;
 import java.util.Properties;
 
 import javax.servlet.ServletException;
@@ -28,8 +29,8 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.esigate.extension.Esi;
 import org.esigate.extension.FetchLogging;
+import org.esigate.extension.http.Retry;
 import org.esigate.http.IncomingRequest;
-import org.esigate.http.RetryExtension;
 import org.esigate.test.PropertiesBuilder;
 import org.esigate.test.TestUtils;
 
@@ -58,10 +59,11 @@ public class DriverHttpTest extends TestCase {
 
         // Conf
         Properties properties = new PropertiesBuilder()//
-                .set(Parameters.REMOTE_URL_BASE, "http://localhost:9999/") //
+                .set(Parameters.REMOTE_URL_BASE.getName(), "http://localhost:9999/") //
                 // Enable retry
-                .set(Parameters.EXTENSIONS, Esi.class, RetryExtension.class, FetchLogging.class) //
-                .set(Parameters.MAX_CONNECTIONS_PER_HOST, 200) //
+                .set(Parameters.EXTENSIONS.getName(), Esi.class, Retry.class, FetchLogging.class) //
+                .set(Retry.NB_RETRY.getName(), "1") //
+                .set(Parameters.MAX_CONNECTIONS_PER_HOST.getName(), 200) //
                 .build();
 
         Driver driver = Driver.builder().setName("tested").setProperties(properties).build();
@@ -74,11 +76,20 @@ public class DriverHttpTest extends TestCase {
             @Override
             public void handle(String arg0, Request baseRequest, HttpServletRequest arg2, HttpServletResponse response)
                     throws IOException, ServletException {
-                response.setContentType("text/html;charset=utf-8");
-                response.setStatus(HttpServletResponse.SC_OK);
-                response.setHeader("Cache-Control", "private");
-                response.getWriter().print("OK");
-                baseRequest.setHandled(true);
+
+                if (arg0.equals("/foobar/")) {
+                    response.setContentType("text/html;charset=utf-8");
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.setHeader("Cache-Control", "private");
+                    response.getWriter().print("<esi:include src=\"/foobar/esi.html\"/>");
+                    baseRequest.setHandled(true);
+                } else if (arg0.equals("/foobar/esi.html")) {
+                    response.setContentType("text/html;charset=utf-8");
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.setHeader("Cache-Control", "private");
+                    response.getWriter().print("OK");
+                    baseRequest.setHandled(true);
+                }
             }
 
         });
@@ -91,9 +102,8 @@ public class DriverHttpTest extends TestCase {
         Assert.assertEquals("OK", EntityUtils.toString(response.getEntity()));
 
         // Restart server.
-        // This breaks closes the socket and will cause an IO error, as Http Client only
-        // tests
-        // connections which are idle for more than 2s
+        // This breaks closes the socket and will cause an IO error, as Http
+        // Client only tests connections which are idle for more than 2s
         server.stop();
         server.start();
 
@@ -104,6 +114,76 @@ public class DriverHttpTest extends TestCase {
         Assert.assertEquals("OK", EntityUtils.toString(response.getEntity()));
 
         server.stop();
+
     }
 
+    /**
+     * Ensure Http client retry behavior can be enabled. Ensure errors still happens after all retries (using retries =
+     * 0)
+     * <p>
+     * 
+     * @see https://github.com/esigate/esigate/issues/185
+     * 
+     * @throws Exception
+     */
+    public void testHttpClientRetry2() throws Exception {
+
+        // Conf
+        Properties properties = new PropertiesBuilder()//
+                .set(Parameters.REMOTE_URL_BASE.getName(), "http://localhost:9999/") //
+                // Enable retry
+                .set(Parameters.EXTENSIONS.getName(), Esi.class, Retry.class, FetchLogging.class) //
+                .set(Retry.NB_RETRY.getName(), "0") //
+                .set(Parameters.MAX_CONNECTIONS_PER_HOST.getName(), 200) //
+                .build();
+
+        Driver driver = Driver.builder().setName("tested").setProperties(properties).build();
+
+        // Setup remote server (provider) response.
+        Server server = new Server(9999);
+        server.setStopAtShutdown(true);
+
+        server.setHandler(new AbstractHandler() {
+            @Override
+            public void handle(String arg0, Request baseRequest, HttpServletRequest arg2, HttpServletResponse response)
+                    throws IOException, ServletException {
+
+                if (arg0.equals("/foobar/")) {
+                    response.setContentType("text/html;charset=utf-8");
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.setHeader("Cache-Control", "private");
+                    response.getWriter().print("OK");
+                    baseRequest.setHandled(true);
+                }
+            }
+
+        });
+        server.start();
+
+        // Request
+        IncomingRequest requestWithSurrogate = TestUtils.createRequest("http://localhost/foobar/").build();
+
+        HttpResponse response = TestUtils.driverProxy(driver, requestWithSurrogate);
+        Assert.assertEquals("OK", EntityUtils.toString(response.getEntity()));
+
+        // Restart server.
+        // This breaks closes the socket and will cause an IO error, as Http
+        // Client only tests connections which are idle for more than 2s
+        server.stop();
+        server.start();
+
+        // Request
+        requestWithSurrogate = TestUtils.createRequest("http://localhost/foobar/").build();
+
+        try {
+            TestUtils.driverProxy(driver, requestWithSurrogate);
+            fail("Request should fail as connection is  already closed");
+        } catch (HttpErrorPage e) {
+            Assert.assertEquals(502, e.getHttpResponse().getStatusLine().getStatusCode());
+
+        }
+
+        server.stop();
+
+    }
 }
