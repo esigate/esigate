@@ -86,7 +86,8 @@ public class ProxyingHttpClientBuilder extends CachingHttpClientBuilder {
 
             @Override
             public CloseableHttpResponse execute(HttpRoute route, HttpRequestWrapper request,
-                    HttpClientContext httpClientContext, HttpExecutionAware execAware) {
+                    HttpClientContext httpClientContext, HttpExecutionAware execAware) throws IOException,
+                    HttpException {
                 OutgoingRequestContext context = OutgoingRequestContext.adapt(httpClientContext);
                 // Create request event
                 FetchEvent fetchEvent = new FetchEvent(context, request);
@@ -103,13 +104,16 @@ public class ProxyingHttpClientBuilder extends CachingHttpClientBuilder {
                 } else {
                     try {
                         fetchEvent.setHttpResponse(wrapped.execute(route, request, context, execAware));
+                        eventManager.fire(EventManager.EVENT_FETCH_POST, fetchEvent);
                     } catch (IOException | HttpException e) {
                         fetchEvent.setHttpResponse(HttpErrorPage.generateHttpResponse(e));
+                        // Usually we want to render and cache the exception but we let an extension decide
+                        fetchEvent.setExit(true);
+                        eventManager.fire(EventManager.EVENT_FETCH_POST, fetchEvent);
+                        if (!fetchEvent.isExit())
+                            throw e; // Throw the exception and let http client process it (may retry)
                     }
                 }
-
-                // Update the event and fire post event
-                eventManager.fire(EventManager.EVENT_FETCH_POST, fetchEvent);
 
                 return fetchEvent.getHttpResponse();
             }
