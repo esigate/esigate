@@ -94,23 +94,25 @@ public class ProxyingHttpClientBuilder extends CachingHttpClientBuilder {
 
                 eventManager.fire(EventManager.EVENT_FETCH_PRE, fetchEvent);
 
-                try {
-                    if (fetchEvent.isExit()) {
-                        if (fetchEvent.getHttpResponse() == null) {
-                            // Provide an error page in order to avoid a NullPointerException
-                            fetchEvent.setHttpResponse(HttpErrorPage.generateHttpResponse(
-                                    HttpStatus.SC_INTERNAL_SERVER_ERROR,
-                                    "An extension stopped the processing of the request without providing a response"));
-                        }
-                    } else {
-                        fetchEvent.setHttpResponse(wrapped.execute(route, request, context, execAware));
+                if (fetchEvent.isExit()) {
+                    if (fetchEvent.getHttpResponse() == null) {
+                        // Provide an error page in order to avoid a NullPointerException
+                        fetchEvent.setHttpResponse(HttpErrorPage.generateHttpResponse(
+                                HttpStatus.SC_INTERNAL_SERVER_ERROR,
+                                "An extension stopped the processing of the request without providing a response"));
                     }
-                } catch (IOException | HttpException e) {
-                    fetchEvent.setHttpResponse(HttpErrorPage.generateHttpResponse(e));
-                    throw e;
-                } finally {
-                    // Update the event and fire post event
-                    eventManager.fire(EventManager.EVENT_FETCH_POST, fetchEvent);
+                } else {
+                    try {
+                        fetchEvent.setHttpResponse(wrapped.execute(route, request, context, execAware));
+                        eventManager.fire(EventManager.EVENT_FETCH_POST, fetchEvent);
+                    } catch (IOException | HttpException e) {
+                        fetchEvent.setHttpResponse(HttpErrorPage.generateHttpResponse(e));
+                        fetchEvent.setExit(true); // Usually we want to render the exception but we let an extension
+                                                  // decide
+                        eventManager.fire(EventManager.EVENT_FETCH_POST, fetchEvent);
+                        if (!fetchEvent.isExit())
+                            throw e; // Throw the exception and let http client process it
+                    }
                 }
 
                 return fetchEvent.getHttpResponse();
