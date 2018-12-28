@@ -283,8 +283,9 @@ public final class UriUtils {
 
     /**
      * Returns a list of {@link NameValuePair NameValuePairs} as built from the URI's query portion. For example, a URI
-     * of http://example.org/path/to/file?a=1&b=2&c=3 would return a list of three NameValuePairs, one for a=1, one for
-     * b=2, and one for c=3. By convention, {@code '&'} and {@code ';'} are accepted as parameter separators.
+     * of http://example.org/path/to/file?a=1&amp;b=2&amp;c=3 would return a list of three NameValuePairs, one for a=1,
+     * one for b=2, and one for c=3. By convention, {@code '&amp;'} and {@code ';'} are accepted as parameter
+     * separators.
      * <p>
      * This is typically useful while parsing an HTTP PUT.
      * 

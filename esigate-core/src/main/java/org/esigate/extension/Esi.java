@@ -17,7 +17,7 @@ import org.esigate.extension.surrogate.Surrogate;
 /**
  * This extension processes ESI directives. Ex:
  * <p>
- * &lt;esi:include src="$(PROVIDER{cms})/news" fragment="news_1"/>
+ * &lt;esi:include src="$(PROVIDER{cms})/news" fragment="news_1"/&gt;
  * <p>
  * Surrogate-Control is supported, with the following behavior :
  * <ul>

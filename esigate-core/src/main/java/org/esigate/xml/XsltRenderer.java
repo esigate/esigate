@@ -28,6 +28,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.XMLConstants;
 
 import nu.validator.htmlparser.common.DoctypeExpectation;
 import nu.validator.htmlparser.dom.Dom2Sax;
@@ -47,7 +48,7 @@ import org.xml.sax.SAXException;
 /**
  * Applies an XSLT transformation to the retrieved data.
  * 
- * If no namespace is specified in the document to transform, it is asumed as:<br />
+ * If no namespace is specified in the document to transform, it is asumed as:<br>
  * xmlns="http://www.w3.org/1999/xhtml"
  * 
  * @author Stanislav Bernatskyi
@@ -88,6 +89,8 @@ public class XsltRenderer implements Renderer {
 
     private static Transformer createTransformer(InputStream templateStream) throws IOException {
         try {
+            // Ensure XSLT cannot use advanced extensions during processing.
+            TRANSFORMER_FACTORY.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
             return TRANSFORMER_FACTORY.newTransformer(new StreamSource(templateStream));
         } catch (TransformerConfigurationException e) {
             throw new ProcessingFailedException("Failed to create XSLT template", e);

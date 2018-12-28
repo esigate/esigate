@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.io.output.StringBuilderWriter;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.HttpEntity;

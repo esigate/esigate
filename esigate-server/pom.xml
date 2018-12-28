@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>esigate</artifactId>
 		<groupId>org.esigate</groupId>
-		<version>5.3-SNAPSHOT</version>
+		<version>5.4-SNAPSHOT</version>
 	</parent>
 	<name>ESIGate server</name>
 	<description>Standalone server for development. Can be run using java -jar esigate-server-&lt;version&gt;.jar -Desigate.config=&lt;config file&gt;</description>
@@ -35,9 +35,9 @@
 			<artifactId>commons-io</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.codahale.metrics</groupId>
+			<groupId>io.dropwizard.metrics</groupId>
 			<artifactId>metrics-jetty9</artifactId>
-			<version>3.0.1</version>
+			<version>4.0.3</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -75,7 +75,7 @@
 			<plugin>
 				<groupId>org.eclipse.jetty</groupId>
 				<artifactId>jetty-maven-plugin</artifactId>
-				<version>9.2.2.v20140723</version>
+				<version>9.4.12.v20180830</version>
 				<configuration>
 					<scanIntervalSeconds>10</scanIntervalSeconds>
 					<webApp>
@@ -118,6 +118,10 @@
 				<groupId>com.googlecode.maven-java-formatter-plugin</groupId>
 				<artifactId>maven-java-formatter-plugin</artifactId>
 			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+			</plugin>
 		</plugins>
 	</build>
 	<dependencyManagement>
@@ -130,7 +134,7 @@
 		</dependencies>
 	</dependencyManagement>
 	<properties>
-		<jetty.version>9.1.2.v20140210</jetty.version>
+		<jetty.version>9.4.12.v20180830</jetty.version>
 	</properties>
 	<reporting>
 		<plugins>
@@ -154,8 +158,16 @@
 				<artifactId>maven-surefire-report-plugin</artifactId>
 			</plugin>
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>cobertura-maven-plugin</artifactId>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>report</report>
+
+						</reports>
+					</reportSet>
+				</reportSets>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

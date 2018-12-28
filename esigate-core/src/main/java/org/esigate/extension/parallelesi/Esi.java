@@ -38,16 +38,16 @@ import org.slf4j.LoggerFactory;
 /**
  * This extension processes ESI directives, like :
  * <p>
- * &lt;esi:include src="$(PROVIDER{cms})/news" fragment="news_1"/>
+ * &lt;esi:include src="$(PROVIDER{cms})/news" fragment="news_1"/&gt;
  * <p>
  * This extension implements multi-threaded processing, aka Parallel ESI.
  * <p>
  * It uses the following parameters :
  * <ul>
- * <li>esi_max_threads</li> : Maximum number of thread allocated to run parallel esi requests. Default is 0 : parallel
- * esi is disabled.
- * <li>esi_min_threads</li> : Minimun number of allocated threads.
- * <li>esi_max_idle :</li> : Release threads after X seconds of idle.
+ * <li>esi_max_threads : Maximum number of thread allocated to run parallel esi requests. Default is 0 : parallel esi is
+ * disabled.</li>
+ * <li>esi_min_threads : Minimun number of allocated threads.</li>
+ * <li>esi_max_idle : Release threads after X seconds of idle.</li>
  * <li>esi_max_queue : Maximum waiting esi requests (waiting for threads). When the limit is reached, new requests are
  * refused.</li>
  * </ul>

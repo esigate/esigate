@@ -20,8 +20,6 @@ import java.util.Date;
 import java.util.Properties;
 import java.util.zip.GZIPOutputStream;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.io.output.NullOutputStream;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -40,8 +38,11 @@ import org.esigate.cache.EhcacheCacheStorage;
 import org.esigate.cookie.CookieManager;
 import org.esigate.extension.ExtensionFactory;
 import org.esigate.impl.DriverRequest;
+import org.esigate.test.PropertiesBuilder;
 import org.esigate.test.TestUtils;
 import org.esigate.test.conn.MockConnectionManager;
+
+import junit.framework.TestCase;
 
 /**
  * DriverConfiguration test case.
@@ -125,16 +126,20 @@ public class HttpClientRequestExecutorTest extends TestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        properties = new Properties();
-        properties.put(Parameters.REMOTE_URL_BASE, "http://localhost:8080");
+
+        properties = new PropertiesBuilder().set(Parameters.REMOTE_URL_BASE, "http://localhost:8080").build();
+
         mockConnectionManager = new MockConnectionManager();
 
     }
 
     public void testCacheAndLoadBalancing() throws Exception {
-        properties.put(Parameters.REMOTE_URL_BASE, "http://localhost:8080, http://127.0.0.1:8080");
-        properties.put(Parameters.USE_CACHE.getName(), "true"); // Default value
-        properties.put(Parameters.PRESERVE_HOST.getName(), "true");
+        properties =
+                new PropertiesBuilder().on(properties)
+                        .set(Parameters.REMOTE_URL_BASE, "http://localhost:8080, http://127.0.0.1:8080")
+                        .set(Parameters.USE_CACHE, true) // Default value
+                        .set(Parameters.PRESERVE_HOST, true).build();
+
         createHttpClientRequestExecutor();
         // First request
         HttpResponse response = createMockResponse("0");
@@ -151,9 +156,12 @@ public class HttpClientRequestExecutorTest extends TestCase {
     }
 
     public void testCacheAndLoadBalancingNoPreserveHost() throws Exception {
-        properties.put(Parameters.REMOTE_URL_BASE, "http://localhost:8080, http://127.0.0.1:8080");
-        properties.put(Parameters.USE_CACHE, "true"); // Default value
-        properties.put(Parameters.PRESERVE_HOST, "false");
+        properties =
+                new PropertiesBuilder().on(properties)
+                        .set(Parameters.REMOTE_URL_BASE, "http://localhost:8080, http://127.0.0.1:8080")
+                        .set(Parameters.USE_CACHE, true) // Default value
+                        .set(Parameters.PRESERVE_HOST, false).build();
+
         createHttpClientRequestExecutor();
         // First request
         HttpResponse response = createMockResponse("0");
@@ -170,12 +178,14 @@ public class HttpClientRequestExecutorTest extends TestCase {
     }
 
     public void testCacheStaleIfError() throws Exception {
-        properties.put(Parameters.USE_CACHE.getName(), "true"); // Default value
-        properties.put(Parameters.STALE_IF_ERROR.getName(), "60");
-        properties.put(Parameters.STALE_WHILE_REVALIDATE.getName(), "60");
-        properties.put(Parameters.MIN_ASYNCHRONOUS_WORKERS.getName(), "1");
-        properties.put(Parameters.MAX_ASYNCHRONOUS_WORKERS.getName(), "10");
-        properties.put(Parameters.HEURISTIC_CACHING_ENABLED.getName(), "false");
+        properties = new PropertiesBuilder().on(properties) //
+                .set(Parameters.USE_CACHE, true) // Default value
+                .set(Parameters.STALE_IF_ERROR, 60) //
+                .set(Parameters.STALE_WHILE_REVALIDATE, 60) //
+                .set(Parameters.MIN_ASYNCHRONOUS_WORKERS, 1) //
+                .set(Parameters.MAX_ASYNCHRONOUS_WORKERS, 10)//
+                .set(Parameters.HEURISTIC_CACHING_ENABLED, false).build();
+
         createHttpClientRequestExecutor();
         // First request
         HttpResponse response = createMockResponse("0");
@@ -205,8 +215,10 @@ public class HttpClientRequestExecutorTest extends TestCase {
     }
 
     public void testCacheTtl() throws Exception {
-        properties.put(Parameters.USE_CACHE.getName(), "true"); // Default value
-        properties.put(Parameters.TTL.getName(), "1");
+        properties = new PropertiesBuilder().on(properties) //
+                .set(Parameters.USE_CACHE, true) // Default value
+                .set(Parameters.TTL, 1).build();
+
         createHttpClientRequestExecutor();
         // First request
         HttpResponse response = createMockResponse("0");
@@ -227,9 +239,13 @@ public class HttpClientRequestExecutorTest extends TestCase {
     }
 
     public void assertStatusCodeIsCachedWithTtl(int statusCode, boolean responseHasBody) throws Exception {
-        properties.put(Parameters.USE_CACHE, "true"); // Default value
-        properties.put(Parameters.TTL, "1");
-        properties.put(Parameters.X_CACHE_HEADER, "true");
+        // Conf
+        properties = new PropertiesBuilder().on(properties) //
+                .set(Parameters.USE_CACHE, true) // Default value
+                .set(Parameters.TTL, 1) //
+                .set(Parameters.X_CACHE_HEADER, true) //
+                .build();
+
         createHttpClientRequestExecutor();
         // First request
         HttpResponse response;
@@ -297,8 +313,12 @@ public class HttpClientRequestExecutorTest extends TestCase {
     }
 
     public void testEhCache() throws Exception {
-        properties.put(Parameters.USE_CACHE.getName(), "true"); // Default value
-        properties.put(Parameters.CACHE_STORAGE.getName(), EhcacheCacheStorage.class.getName()); // Default
+
+        properties = new PropertiesBuilder().on(properties) //
+                .set(Parameters.USE_CACHE, true) // Default value
+                .set(Parameters.CACHE_STORAGE, EhcacheCacheStorage.class) // Default
+                .build();
+
         // value
         createHttpClientRequestExecutor();
         // First request
@@ -316,8 +336,10 @@ public class HttpClientRequestExecutorTest extends TestCase {
     }
 
     public void testXCacheHeader() throws Exception {
-        properties.put(Parameters.USE_CACHE.getName(), "true"); // Default value
-        properties.put(Parameters.X_CACHE_HEADER.getName(), "true");
+        properties = new PropertiesBuilder().on(properties) //
+                .set(Parameters.USE_CACHE, true) // Default value
+                .set(Parameters.X_CACHE_HEADER, true).build();
+
         createHttpClientRequestExecutor();
         // First request
         HttpResponse response = createMockResponse("0");
@@ -341,9 +363,12 @@ public class HttpClientRequestExecutorTest extends TestCase {
     public void testXCacheHeaderWithLoadBalancingNoCache() throws Exception {
         // Use load balancing in round robin mode and check that the header
         // indicates properly the host that was used for the request
-        properties.put(Parameters.USE_CACHE.getName(), "true"); // Default value
-        properties.put(Parameters.X_CACHE_HEADER.getName(), "true");
-        properties.put(Parameters.REMOTE_URL_BASE_STRATEGY.getName(), Parameters.ROUNDROBIN);
+        properties = new PropertiesBuilder().on(properties) //
+                .set(Parameters.USE_CACHE, true) // Default value
+                .set(Parameters.X_CACHE_HEADER, true) //
+                .set(Parameters.REMOTE_URL_BASE_STRATEGY, Parameters.ROUNDROBIN) //
+                .build();
+
         createHttpClientRequestExecutor();
         // First request
         HttpResponse response = createMockResponse("1");
@@ -373,10 +398,13 @@ public class HttpClientRequestExecutorTest extends TestCase {
     public void testXCacheHeaderWithLoadBalancing() throws Exception {
         // Use load balancing in round robin mode and check that the header
         // indicates properly the host that was used for the request
-        properties.put(Parameters.USE_CACHE.getName(), "true"); // Default value
-        properties.put(Parameters.PRESERVE_HOST.getName(), "true");
-        properties.put(Parameters.X_CACHE_HEADER.getName(), "true");
-        properties.put(Parameters.REMOTE_URL_BASE_STRATEGY.getName(), Parameters.ROUNDROBIN);
+        properties = new PropertiesBuilder().on(properties) //
+                .set(Parameters.USE_CACHE, true) // Default value
+                .set(Parameters.PRESERVE_HOST, true) //
+                .set(Parameters.X_CACHE_HEADER, true) //
+                .set(Parameters.REMOTE_URL_BASE_STRATEGY, Parameters.ROUNDROBIN) //
+                .build();
+
         createHttpClientRequestExecutor();
         // First request
         HttpResponse response = createMockResponse("1");
@@ -403,8 +431,11 @@ public class HttpClientRequestExecutorTest extends TestCase {
     }
 
     public void testDecompressStream() throws IOException, HttpErrorPage {
-        properties.put("default" + Parameters.REMOTE_URL_BASE.getName(), "http://localhost,http://127.0.0.1");
-        properties.put(Parameters.USE_CACHE.getName(), "true"); // Default value
+        properties = new PropertiesBuilder().on(properties) //
+                .set("default" + Parameters.REMOTE_URL_BASE.getName(), "http://localhost,http://127.0.0.1") //
+                .set(Parameters.USE_CACHE, true)// Default value
+                .build();
+
         createHttpClientRequestExecutor();
         String content = "To be compressed";
         HttpResponse httpResponse = createMockGzippedResponse(content);
@@ -416,10 +447,11 @@ public class HttpClientRequestExecutorTest extends TestCase {
 
     private void sendRequestAndCheckHostHeader(String uri, String targetHost, String virtualHost,
             String expectedHostHeader) throws Exception {
-        properties = new Properties();
-        properties.put(Parameters.PRESERVE_HOST.getName(), "true");
-        properties.put(Parameters.REMOTE_URL_BASE.getName(), targetHost);
-        properties.put(Parameters.USE_CACHE.getName(), "false");
+        properties = new PropertiesBuilder() //
+                .set(Parameters.REMOTE_URL_BASE, targetHost) //
+                .set(Parameters.PRESERVE_HOST, true) //
+                .set(Parameters.USE_CACHE, false).build();
+
         createHttpClientRequestExecutor();
 
         mockConnectionManager.setResponse(createMockResponse(""));
@@ -473,18 +505,20 @@ public class HttpClientRequestExecutorTest extends TestCase {
         mockConnectionManager.setResponse(createMockResponse(""));
 
         // Create a first HttpClientHelper with preserveHost = true
-        properties = new Properties();
-        properties.put(Parameters.PRESERVE_HOST.getName(), "true");
-        properties.put(Parameters.REMOTE_URL_BASE.getName(), "http://localhost:8080");
-        properties.put(Parameters.USE_CACHE.getName(), "false");
+        properties = new PropertiesBuilder() //
+                .set(Parameters.REMOTE_URL_BASE, "http://localhost:8080") //
+                .set(Parameters.PRESERVE_HOST, true) //
+                .set(Parameters.USE_CACHE, false).build();
+
         createHttpClientRequestExecutor();
         HttpClientRequestExecutor httpClientHelper1 = httpClientRequestExecutor;
 
         // Create a second HttpClientHelper with preserveHost = true
-        properties = new Properties();
-        properties.put(Parameters.PRESERVE_HOST.getName(), "false");
-        properties.put(Parameters.REMOTE_URL_BASE.getName(), "http://localhost:8080");
-        properties.put(Parameters.USE_CACHE.getName(), "false");
+        properties = new PropertiesBuilder() //
+                .set(Parameters.REMOTE_URL_BASE, "http://localhost:8080") //
+                .set(Parameters.PRESERVE_HOST, false)//
+                .set(Parameters.USE_CACHE, false).build();
+
         createHttpClientRequestExecutor();
         HttpClientRequestExecutor httpClientHelper2 = httpClientRequestExecutor;
 
@@ -518,9 +552,11 @@ public class HttpClientRequestExecutorTest extends TestCase {
      * @throws Exception
      */
     public void testCookieWithSpaces() throws Exception {
-        properties = new Properties();
-        properties.put(Parameters.REMOTE_URL_BASE.getName(), "http://localhost:8080");
-        properties.put(Parameters.USE_CACHE, "false");
+        properties = new PropertiesBuilder() //
+                .set(Parameters.REMOTE_URL_BASE, "http://localhost:8080") //
+                .set(Parameters.USE_CACHE, false) // Default value
+                .build();
+
         createHttpClientRequestExecutor();
         DriverRequest originalRequest = TestUtils.createDriverRequest(driver);
         OutgoingRequest request =
@@ -539,9 +575,11 @@ public class HttpClientRequestExecutorTest extends TestCase {
      * @throws Exception
      */
     public void testForcedTtlWith304ResponseCode() throws Exception {
-        properties = new Properties();
-        properties.put(Parameters.REMOTE_URL_BASE.getName(), "http://localhost:8080");
-        properties.put(Parameters.TTL.getName(), "1000");
+        properties = new PropertiesBuilder() //
+                .set(Parameters.REMOTE_URL_BASE, "http://localhost:8080") //
+                .set(Parameters.TTL, 1000) // Default value
+                .build();
+
         createHttpClientRequestExecutor();
         DriverRequest originalRequest = TestUtils.createDriverRequest(driver);
         originalRequest.getOriginalRequest().addHeader("If-Modified-Since", "Fri, 15 Jun 2012 21:06:25 GMT");
@@ -564,9 +602,11 @@ public class HttpClientRequestExecutorTest extends TestCase {
      * @throws Exception
      */
     public void testForcedTtlWith301ResponseCode() throws Exception {
-        properties = new Properties();
-        properties.put(Parameters.REMOTE_URL_BASE.getName(), "http://localhost:8080");
-        properties.put(Parameters.TTL.getName(), "1000");
+        properties = new PropertiesBuilder() //
+                .set(Parameters.REMOTE_URL_BASE, "http://localhost:8080") //
+                .set(Parameters.TTL, 1000) // Default value
+                .build();
+
         createHttpClientRequestExecutor();
         DriverRequest originalRequest = TestUtils.createDriverRequest(driver);
         OutgoingRequest request =
@@ -589,9 +629,11 @@ public class HttpClientRequestExecutorTest extends TestCase {
      * @throws Exception
      */
     public void testForcedTtlWith302ResponseCode() throws Exception {
-        properties = new Properties();
-        properties.put(Parameters.REMOTE_URL_BASE.getName(), "http://localhost:8080");
-        properties.put(Parameters.TTL.getName(), "1000");
+        properties = new PropertiesBuilder() //
+                .set(Parameters.REMOTE_URL_BASE, "http://localhost:8080") //
+                .set(Parameters.TTL, 1000) //
+                .build();
+
         createHttpClientRequestExecutor();
         DriverRequest originalRequest = TestUtils.createDriverRequest(driver);
         OutgoingRequest request =
@@ -614,11 +656,14 @@ public class HttpClientRequestExecutorTest extends TestCase {
      * @throws Exception
      */
     public void testExpiresResponseHeaderWithForcedTtl() throws Exception {
-        properties = new Properties();
-        properties.put(Parameters.REMOTE_URL_BASE, "http://localhost:8080");
-        properties.put(Parameters.TTL, "1");
-        properties.put(Parameters.X_CACHE_HEADER, "true");
-        properties.put(Parameters.HEURISTIC_CACHING_ENABLED, "false");
+
+        properties = new PropertiesBuilder() //
+                .set(Parameters.REMOTE_URL_BASE, "http://localhost:8080") //
+                .set(Parameters.TTL, 1) //
+                .set(Parameters.X_CACHE_HEADER, true) //
+                .set(Parameters.HEURISTIC_CACHING_ENABLED, false) //
+                .build();
+
         createHttpClientRequestExecutor();
         DriverRequest originalRequest = TestUtils.createDriverRequest(driver);
 
@@ -676,10 +721,13 @@ public class HttpClientRequestExecutorTest extends TestCase {
      * @throws Exception
      */
     public void testDoNotReturn304ForNonConditionalRequestWhenTtlSet() throws Exception {
-        properties = new Properties();
-        properties.put(Parameters.REMOTE_URL_BASE, "http://localhost:8080");
-        properties.put(Parameters.TTL, "1");
-        properties.put(Parameters.X_CACHE_HEADER, "true");
+
+        properties = new PropertiesBuilder() //
+                .set(Parameters.REMOTE_URL_BASE, "http://localhost:8080") //
+                .set(Parameters.TTL, 1) //
+                .set(Parameters.X_CACHE_HEADER, true) //
+                .build();
+
         createHttpClientRequestExecutor();
 
         DriverRequest originalRequest = TestUtils.createDriverRequest(driver);
@@ -730,8 +778,13 @@ public class HttpClientRequestExecutorTest extends TestCase {
     }
 
     public void test304CachedResponseIsReusedWithIfModifiedSinceRequest() throws Exception {
-        properties.put(Parameters.USE_CACHE, "true"); // Default value
-        properties.put(Parameters.X_CACHE_HEADER, "true");
+
+        properties = new PropertiesBuilder() //
+                .set(Parameters.REMOTE_URL_BASE, "http://localhost:8080") //
+                .set(Parameters.USE_CACHE, true) // Default value
+                .set(Parameters.X_CACHE_HEADER, true) //
+                .build();
+
         createHttpClientRequestExecutor();
         // First request
         String now = DateUtils.formatDate(new Date());

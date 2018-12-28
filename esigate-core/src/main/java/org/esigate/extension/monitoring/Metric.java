@@ -39,12 +39,12 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * This extension will record proxy request, and backend request to generate statistics.
- * <p/>
+ * <p>
  * Result will be logged using SLF4J in INFO level every 60 seconds. Period can be configured in driver properties :
- * <p/>
+ * <p>
  * <code>metricPeriod=60</code>
- * <p/>
- * <p/>
+ * <p>
+ * <p>
  * Created by alexis on 20/03/14.
  */
 public class Metric implements Extension, IEventListener {

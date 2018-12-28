@@ -32,7 +32,6 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.server.handler.HandlerList;
-import org.eclipse.jetty.server.session.HashSessionManager;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.esigate.server.metrics.InstrumentedServerConnector;
@@ -276,9 +275,7 @@ public final class EsigateServer {
             context.setServer(srv);
             context.setTempDirectory(workDir);
             if (StringUtils.isNoneEmpty(sessionCookieName)) {
-                HashSessionManager hashSessionManager = new HashSessionManager();
-                hashSessionManager.setSessionCookie(sessionCookieName);
-                context.getSessionHandler().setSessionManager(hashSessionManager);
+                context.getSessionHandler().setSessionCookie(sessionCookieName);
             }
             // Add extra classpath (allows to add extensions).
             if (EsigateServer.extraClasspath != null) {

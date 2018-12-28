@@ -22,6 +22,7 @@ import org.esigate.http.HttpClientRequestExecutor;
 import org.esigate.http.IncomingRequest;
 import org.esigate.http.OutgoingRequest;
 import org.esigate.impl.DriverRequest;
+import org.esigate.test.PropertiesBuilder;
 import org.esigate.test.TestUtils;
 import org.esigate.test.conn.MockConnectionManager;
 import org.jasig.cas.client.authentication.AttributePrincipal;
@@ -46,9 +47,11 @@ public class CasAuthenticationHandlerTest extends TestCase {
 
     @Override
     public void setUp() {
-        Properties properties = new Properties();
-        properties.put(Parameters.REMOTE_URL_BASE, "http://localhost:8080");
-        properties.put(CasAuthenticationHandler.CAS_LOGIN_URL, "/loginurl");
+        // Conf
+        Properties properties = new PropertiesBuilder() //
+                .set(Parameters.REMOTE_URL_BASE, "http://localhost:8080") //
+                .set(CasAuthenticationHandler.CAS_LOGIN_URL, "/loginurl") //
+                .build();
 
         mockConnectionManager = new MockConnectionManager();
 

@@ -27,7 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Block renderer.<br/>
+ * Block renderer.<br>
  * 
  * Extracts data between <code>&lt;!--$beginblock$myblock$--&gt;</code> and <code>&lt;!--$endblock$myblock$--&gt;</code>
  * separators

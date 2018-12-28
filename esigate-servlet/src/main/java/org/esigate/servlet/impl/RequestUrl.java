@@ -34,7 +34,7 @@ public final class RequestUrl {
 
     /**
      * Get the relative url to the current servlet.
-     * <p/>
+     * <p>
      * Uses the request URI and removes : the context path, the servlet path if used.
      * 
      * @param request

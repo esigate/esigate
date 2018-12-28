@@ -40,11 +40,11 @@ import org.esigate.HttpErrorPage;
 public interface FutureAppendable {
 
     /**
-     * Queue the Future<CharSequence> for append in this <tt>FutureAppendable</tt>.
+     * Queue the Future&lt;CharSequence&gt; for append in this <tt>FutureAppendable</tt>.
      * 
      * <p>
      * Caller may start computing the content of the Future parameter before or after calling this method (using other
-     * Thread) or simply wait for Future#get() to be called (defered computation).
+     * Thread) or simply wait for Future#get() to be called (deferred computation).
      * 
      * @param csq
      *            The Future character sequence to append. If <tt>csq</tt> is <tt>null</tt>, then the four characters

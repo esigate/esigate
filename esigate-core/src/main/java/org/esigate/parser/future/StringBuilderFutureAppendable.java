@@ -25,8 +25,8 @@ import org.esigate.HttpErrorPage;
 import org.esigate.Parameters;
 
 /**
- * This is an implementation of StringBuilder which can append Future<CharSequence> and is a Future<CharSequence>
- * itself.
+ * This is an implementation of StringBuilder which can append Future&lt;CharSequence&gt; and is a
+ * Future&lt;CharSequence&gt; itself.
  * <p>
  * It is intended for temporary buffers when implementing nested tags.
  * 
