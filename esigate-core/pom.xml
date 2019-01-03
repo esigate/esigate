@@ -86,13 +86,13 @@
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-util</artifactId>
-			<version>9.1.2.v20140210</version>
+			<version>9.3.24.v20180605</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-server</artifactId>
-			<version>9.1.2.v20140210</version>
+			<version>9.3.24.v20180605</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
