@@ -275,7 +275,7 @@ public final class EsigateServer {
             context.setServer(srv);
             context.setTempDirectory(workDir);
             if (StringUtils.isNoneEmpty(sessionCookieName)) {
-                context.getSessionHandler().getSessionManager().getSessionCookieConfig().setName(sessionCookieName);
+                context.getSessionHandler().getSessionCookieConfig().setName(sessionCookieName);
             }
             // Add extra classpath (allows to add extensions).
             if (EsigateServer.extraClasspath != null) {
