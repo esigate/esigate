@@ -2,10 +2,16 @@ sudo: required # for setting hostname
 addons:
   hostname: localhost #https://github.com/travis-ci/travis-ci/issues/5227
 language: java
+dist: trusty
 jdk:
   - oraclejdk8
   - oraclejdk9
-#  - openjdk7
+  - oraclejdk11
+  - oraclejdk12
+  #  - openjdk7
   - openjdk8
+  - openjdk10
+  - openjdk11
+  - openjdk12
 notifications:
   slack: esigate:UgRe31idARp4sQmoz3huPGJU
