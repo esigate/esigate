@@ -6,10 +6,12 @@ dist: trusty
 jdk:
   - oraclejdk8
   - oraclejdk9
-#  - openjdk7
-  - openjdk8
   - oraclejdk11
+  - oraclejdk12
+  #  - openjdk7
+  - openjdk8
   - openjdk10
   - openjdk11
+  - openjdk12
 notifications:
   slack: esigate:UgRe31idARp4sQmoz3huPGJU
