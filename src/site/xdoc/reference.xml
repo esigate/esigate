@@ -1644,7 +1644,7 @@ discardCookies=*
 						secure and
 						scheme
 						is
-						https, in all other cases, cookie est set not
+						https, in all other cases, cookie is set not
 						secure when
 						sent to
 						browser</li>
@@ -1670,7 +1670,7 @@ discardCookies=*
 					To ease update from a previous ESIGate version or simply for inspiration, an adapter between
 					AuthenticationHandler and Extension is provided :
 					<a
-						href="esigate-core/apidocs/org/esigate/authentication/GenericAuthenticationHandler.html">GenericAuthenticationHandler</a>
+						href="esigate-core/apidocs/org/esigate/authentication/GenericAuthentificationHandler.html">GenericAuthentificationHandler</a>
 	
 				</p>
 	
