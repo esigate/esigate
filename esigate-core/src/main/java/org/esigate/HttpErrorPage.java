@@ -1,4 +1,4 @@
-/* 
+/*
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,6 +25,7 @@ import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.HttpVersion;
+import org.apache.http.NoHttpResponseException;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.conn.ConnectTimeoutException;
@@ -151,6 +152,8 @@ public class HttpErrorPage extends Exception {
             return generateHttpResponse(HttpStatus.SC_GATEWAY_TIMEOUT, "Socket timeout");
         } else if (exception instanceof SocketException) {
             return generateHttpResponse(HttpStatus.SC_BAD_GATEWAY, "Socket Exception");
+        } else if (exception instanceof NoHttpResponseException) {
+            return generateHttpResponse(HttpStatus.SC_BAD_GATEWAY, "The target server failed to respond");
         } else if (exception instanceof ClientProtocolException) {
             String message = exception.getMessage();
             if (message == null && exception.getCause() != null) {
