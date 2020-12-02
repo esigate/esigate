@@ -118,7 +118,7 @@ public class Esi implements Extension, IEventListener {
         if (minThreads > 0 && coreThreads == 0) {
             coreThreads = minThreads;
         }
-        
+
         int idle = IDLE.getValue(properties);
         int maxQueue = MAX_QUEUE.getValue(properties);
 

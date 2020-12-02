@@ -9,6 +9,7 @@
 
 # Maven
 target
+/esigate-app-cas/overlays/
 
 # MacOS
 .DS_Store
