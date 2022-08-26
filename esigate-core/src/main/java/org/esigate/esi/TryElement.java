@@ -31,22 +31,30 @@ class TryElement extends BaseElement {
 
     };
     private boolean write = false;
-    private boolean hasErrors;
     private boolean exceptProcessed;
     private int errorCode;
+    private Exception error;
 
     TryElement() {
     }
 
     @Override
     protected boolean parseTag(Tag tag, ParserContext ctx) {
-        this.hasErrors = false;
+        this.error = null;
         this.errorCode = 0;
         return true;
     }
 
     public boolean hasErrors() {
-        return hasErrors;
+        return this.error != null;
+    }
+
+    public boolean hasHttpError() {
+        return this.hasErrors() && this.error instanceof HttpErrorPage;
+    }
+
+    public HttpErrorPage getHttpError() {
+        return (HttpErrorPage) this.error;
     }
 
     public int getErrorCode() {
@@ -70,9 +78,9 @@ class TryElement extends BaseElement {
 
     @Override
     public boolean onError(Exception e, ParserContext ctx) {
-        hasErrors = true;
-        if (e instanceof HttpErrorPage) {
-            errorCode = ((HttpErrorPage) e).getHttpResponse().getStatusLine().getStatusCode();
+        this.error = e;
+        if (this.hasHttpError()) {
+            errorCode = this.getHttpError().getHttpResponse().getStatusLine().getStatusCode();
         }
         return true;
     }

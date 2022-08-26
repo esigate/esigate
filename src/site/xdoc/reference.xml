@@ -637,7 +637,7 @@ someUrl=/cms/article123
 			<source>
 &lt;esi:try&gt;
    &lt;esi:attempt&gt; ... &lt;/esi:attempt&gt;
-   &lt;esi:except code="500"&gt; ... &lt;/esi:except&gt;
+   &lt;esi:except code="500" responseCode="503"&gt; ... &lt;/esi:except&gt;
 &lt;/esi:try&gt;</source>
 		</subsection>
 		<subsection name="&lt;esi:choose&gt; &lt;esi:when&gt; &lt;esi:otherwise&gt;">
@@ -888,6 +888,16 @@ someUrl=/cms/article123
 			<td>Yes</td>
 			<td>Yes</td>
 			<td>Yes</td>
+			<td>&nbsp;</td>
+			</tr>
+			<tr>
+			<td></td>
+			<td>responseCode</td>
+			<td>Http return code that will be returned by this except block</td>
+			<td></td>
+			<td>&nbsp;</td>
+			<td>Yes</td>
+			<td>&nbsp;</td>
 			<td>&nbsp;</td>
 			</tr>
 			<tr>

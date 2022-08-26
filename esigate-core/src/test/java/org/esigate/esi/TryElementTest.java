@@ -17,6 +17,7 @@ package org.esigate.esi;
 import java.io.IOException;
 
 import org.esigate.HttpErrorPage;
+import org.junit.Assert;
 
 public class TryElementTest extends AbstractElementTest {
 
@@ -95,26 +96,57 @@ public class TryElementTest extends AbstractElementTest {
         assertEquals("begin inside except end", result);
     }
 
-    public void testExcept2() throws IOException, HttpErrorPage {
-        String page =
-                "begin <esi:try>" + "<esi:attempt> " + "<esi:include src='http://www.foo.com/test' /> abc "
-                        + "<esi:include src=\"http://www.foo2.com/test\" /> cba" + "</esi:attempt>"
-                        + "<esi:except>inside except</esi:except>" + "</esi:try> end";
-        String result = render(page);
-        assertEquals("begin inside except end", result);
-    }
+	public void testExcept2() throws IOException, HttpErrorPage {
+		String page =
+				"begin <esi:try>" + "<esi:attempt> " + "<esi:include src='http://www.foo.com/test' /> abc "
+						+ "<esi:include src=\"http://www.foo2.com/test\" /> cba" + "</esi:attempt>"
+						+ "<esi:except>inside except</esi:except>" + "</esi:try> end";
+		String result = render(page);
+		assertEquals("begin inside except end", result);
+	}
 
-    public void testMultipleExcept() throws IOException, HttpErrorPage {
-        String page =
-                "begin <esi:try>" + "<esi:attempt> "
-                        + "<esi:attempt>abc <esi:include src='http://www.foo2.com/test' /> cba</esi:attempt>"
-                        + "</esi:attempt>" + "<esi:except code='500'>inside incorrect except</esi:except>"
-                        + "<esi:except code='404'>inside correct except</esi:except>"
-                        + "<esi:except code='412'>inside incorrect except</esi:except>"
-                        + "<esi:except>inside default except</esi:except>" + "</esi:try> end";
-        String result = render(page);
-        assertEquals("begin inside correct except end", result);
-    }
+	public void testExceptWithForcedResponseCode() throws IOException {
+		String page =
+				"begin <esi:try>"
+						+ "<esi:attempt>abc <esi:include src=\"http://www.foo2.com/test\" /> cba</esi:attempt>"
+						+ "<esi:except responseCode=\"503\">inside except</esi:except>" + "</esi:try> end";
+
+		try {
+			render(page);
+			Assert.fail("Must generate an error page.");
+		} catch (HttpErrorPage error) {
+			Assert.assertEquals(503, error.getHttpResponse().getStatusLine().getStatusCode());
+		}
+	}
+
+	public void testMultipleExcept() throws IOException, HttpErrorPage {
+		String page =
+				"begin <esi:try>" + "<esi:attempt> "
+						+ "<esi:attempt>abc <esi:include src='http://www.foo2.com/test' /> cba</esi:attempt>"
+						+ "</esi:attempt>" + "<esi:except code='500'>inside incorrect except</esi:except>"
+						+ "<esi:except code='404'>inside correct except</esi:except>"
+						+ "<esi:except code='412'>inside incorrect except</esi:except>"
+						+ "<esi:except>inside default except</esi:except>" + "</esi:try> end";
+		String result = render(page);
+		assertEquals("begin inside correct except end", result);
+	}
+
+	public void testMultipleExceptWithForcedResponseCode() throws IOException, HttpErrorPage {
+		String page =
+				"begin <esi:try>" + "<esi:attempt> "
+						+ "<esi:attempt>abc <esi:include src='http://www.foo2.com/test' /> cba</esi:attempt>"
+						+ "</esi:attempt>" + "<esi:except code='500'>inside incorrect except</esi:except>"
+						+ "<esi:except code='404' responseCode='503'>inside correct except</esi:except>"
+						+ "<esi:except code='412'>inside incorrect except</esi:except>"
+						+ "<esi:except>inside default except</esi:except>" + "</esi:try> end";
+
+		try {
+			render(page);
+			Assert.fail("Must generate an error page.");
+		} catch (HttpErrorPage error) {
+			Assert.assertEquals(503, error.getHttpResponse().getStatusLine().getStatusCode());
+		}
+	}
 
     public void testDefaultExcept() throws IOException, HttpErrorPage {
         String page =

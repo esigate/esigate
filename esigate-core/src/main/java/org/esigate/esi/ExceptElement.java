@@ -31,6 +31,7 @@ class ExceptElement extends BaseElement {
     };
 
     private boolean processContent;
+    private boolean shouldThrowError;
 
     ExceptElement() {
     }
@@ -39,14 +40,24 @@ class ExceptElement extends BaseElement {
     protected boolean parseTag(Tag tag, ParserContext ctx) {
         TryElement parent = ctx.findAncestor(TryElement.class);
         int code = -1;
+        int forcedResponseCode = -1;
         if (tag.getAttribute("code") != null) {
             code = Integer.parseInt(tag.getAttribute("code"));
-
         }
+        if (tag.getAttribute("responseCode") != null) {
+            forcedResponseCode = Integer.parseInt(tag.getAttribute("responseCode"));
+        }
+
         processContent =
                 (parent.hasErrors() && !parent.exceptProcessed() && (code == -1 || code == parent.getErrorCode()));
+        shouldThrowError = false;
         if (processContent) {
-            parent.setExceptProcessed(processContent);
+            parent.setExceptProcessed(true);
+
+            if (forcedResponseCode != -1 && parent.hasHttpError()) {
+                parent.getHttpError().getHttpResponse().setStatusCode(forcedResponseCode);
+                shouldThrowError = true;
+            }
         }
         return processContent;
     }
@@ -59,9 +70,12 @@ class ExceptElement extends BaseElement {
     }
 
     @Override
-    public void onTagEnd(String tag, ParserContext ctx) {
+    public void onTagEnd(String tag, ParserContext ctx) throws HttpErrorPage {
         TryElement parent = ctx.findAncestor(TryElement.class);
         parent.setWrite(false);
+		if(this.processContent && this.shouldThrowError) {
+			throw parent.getHttpError();
+		}
     }
 
     @Override
