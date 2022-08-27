@@ -22,7 +22,9 @@ import org.esigate.extension.ConfigReloadOnChange;
 import org.esigate.extension.Esi;
 import org.esigate.extension.FetchLogging;
 import org.esigate.extension.FragmentLogging;
+import org.esigate.extension.OnErrorResponseCodeReplacer;
 import org.esigate.extension.ResourceFixup;
+import org.esigate.extension.XCorrelationId;
 import org.esigate.extension.XPoweredBy;
 import org.esigate.extension.surrogate.Surrogate;
 import org.esigate.util.Parameter;
@@ -79,7 +81,8 @@ public final class Parameters {
     public static final Parameter<Collection<String>> EXTENSIONS = new ParameterCollection("extensions",
             FragmentLogging.class.getName(), FetchLogging.class.getName(),
             RemoteUserAuthenticationHandler.class.getName(), Esi.class.getName(), ResourceFixup.class.getName(),
-            XPoweredBy.class.getName(), Surrogate.class.getName(), ConfigReloadOnChange.class.getName());
+            XPoweredBy.class.getName(), Surrogate.class.getName(), ConfigReloadOnChange.class.getName(),
+			XCorrelationId.class.getName(), OnErrorResponseCodeReplacer.class.getName());
     // Cache settings
     public static final Parameter<Boolean> USE_CACHE = new ParameterBoolean("useCache", true);
     public static final Parameter<Integer> MAX_CACHE_ENTRIES = new ParameterInteger("maxCacheEntries", 1000);
