@@ -14,10 +14,11 @@
 			<groupId>org.esigate</groupId>
 			<artifactId>esigate-servlet</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-		</dependency>
+	<dependency>
+    <groupId>org.apache.logging.log4j</groupId>
+    <artifactId>log4j-slf4j-impl</artifactId>
+  
+</dependency>
 	</dependencies>
 	<build>
 		<plugins>
