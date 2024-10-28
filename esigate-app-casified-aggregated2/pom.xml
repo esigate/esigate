@@ -4,7 +4,7 @@
 	<packaging>war</packaging>
 	<name>esigate-app-casified-aggregated2</name>
 	<properties>
-		<spring-security.version>5.4.11</spring-security.version>
+		<spring-security.version>5.7.13</spring-security.version>
 	</properties>
 	<parent>
 		<artifactId>esigate</artifactId>
